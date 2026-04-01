@@ -1,0 +1,34 @@
+# .NET / Visual Studio
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# JavaScript / Angular
+node_modules/
+dist/
+dist-server/
+.angular/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ABP / Tools
+LocalAbpTools/
+ABP_Tools/
+.abp/
+
+# Extras
+*.pdf
+*.txt
+extract_pdfs.py
