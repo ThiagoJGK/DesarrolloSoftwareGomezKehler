@@ -1,0 +1,114 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="fas fa-layer-group me-2 text-primary"></i> Mi Tablero</h2>
+    <span class="badge bg-primary fs-6" *ngIf="isAdmin"><i class="fas fa-shield-alt me-1"></i> Mode: Admin</span>
+  </div>
+
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'experiences'" href="javascript:void(0)" (click)="setTab('experiences')">
+        <i class="fas fa-book-open me-2"></i> Mis Experiencias
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'favorites'" href="javascript:void(0)" (click)="setTab('favorites')">
+        <i class="fas fa-heart me-2 text-danger"></i> Mis Favoritos
+      </a>
+    </li>
+    <li class="nav-item" *ngIf="isAdmin">
+      <a class="nav-link text-success fw-bold" [class.active]="activeTab === 'admin'" href="javascript:void(0)" (click)="setTab('admin')">
+        <i class="fas fa-chart-line me-2"></i> Métricas API (Admin)
+      </a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    
+    <!-- Tab Mis Experiencias -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'experiences'" [class.active]="activeTab === 'experiences'" *ngIf="activeTab === 'experiences'">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h4 class="card-title mb-4">Diarios de Viaje</h4>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Título</th>
+                  <th>Tags</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let exp of myExperiences">
+                  <td class="fw-semibold">{{ exp.title }}</td>
+                  <td>{{ exp.keywords }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                  </td>
+                </tr>
+                <tr *ngIf="myExperiences.length === 0">
+                  <td colspan="3" class="text-center text-muted py-4">No has compartido ninguna experiencia aún.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Mis Favoritos -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'favorites'" [class.active]="activeTab === 'favorites'" *ngIf="activeTab === 'favorites'">
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" *ngFor="let dest of favoriteDestinations">
+          <div class="card h-100 shadow-sm border-0 bg-light">
+            <div class="card-body text-center">
+              <h5 class="fw-bold">{{ dest.name }}</h5>
+              <p class="text-muted"><i class="fas fa-globe me-1"></i> {{ dest.country }}</p>
+            </div>
+            <div class="card-footer bg-white border-0 d-flex justify-content-between">
+              <a [routerLink]="['/tourism/destination', dest.id]" class="btn btn-sm btn-primary">Ver</a>
+              <button class="btn btn-sm btn-outline-danger" (click)="removeFromFavorites(dest.id || '')"><i class="fas fa-heart-broken"></i> Quitar</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="favoriteDestinations.length === 0">
+          <div class="alert alert-secondary">Tu lista de deseos está vacía. Suma destinos desde el buscador principal.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Admin -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'admin'" [class.active]="activeTab === 'admin'" *ngIf="activeTab === 'admin' && isAdmin">
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="card text-white bg-success shadow-sm h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
+              <h1 class="display-3 fw-bold">142</h1>
+              <h5 class="card-title">LLamadas API GeoDB Cities</h5>
+              <p class="card-text opacity-75">Últimos 30 días</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h5 class="card-title text-success"><i class="fas fa-server me-2"></i>Estado de Workers</h5>
+              <ul class="list-group list-group-flush mt-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Sincronización de Destinos
+                  <span class="badge bg-success rounded-pill">Activo (Diario)</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Búsqueda Ticketmaster API
+                  <span class="badge bg-success rounded-pill">Activo (Idle)</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

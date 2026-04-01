@@ -15,6 +15,20 @@ function configureRoutes(routesService: RoutesService) {
         order: 1,
         layout: eLayoutType.application,
       },
+      {
+        path: '/tourism',
+        name: 'Turismo (Destinos)',
+        iconClass: 'fas fa-plane',
+        order: 2,
+        layout: eLayoutType.application,
+      },
+      {
+        path: '/tourism/dashboard',
+        name: 'Mi Tablero',
+        iconClass: 'fas fa-user-circle',
+        order: 3,
+        layout: eLayoutType.application,
+      },
     ]);
   };
 }
