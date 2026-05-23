@@ -46,6 +46,7 @@ $arguments = @(
     "--headless=new",
     "--no-sandbox",
     "--disable-gpu",
+    "--print-to-pdf-no-header",
     "--print-to-pdf=`"$pdfPath`"",
     "--include-background",
     "`"$htmlPath`""
