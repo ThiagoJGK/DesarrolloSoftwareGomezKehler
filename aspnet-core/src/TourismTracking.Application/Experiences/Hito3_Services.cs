@@ -148,7 +148,8 @@ namespace TourismTracking.Experiences
 
         public async Task<List<Guid>> GetMyFavoriteDestinationsAsync()
         {
-            var userId = _currentUser.Id ?? throw new UnauthorizedAccessException();
+            if (_currentUser.Id == null) return new List<Guid>();
+            var userId = _currentUser.Id.Value;
             var myFavs = await _favoritesRepo.GetListAsync(f => f.UserId == userId);
             return myFavs.Select(f => f.DestinationId).ToList();
         }

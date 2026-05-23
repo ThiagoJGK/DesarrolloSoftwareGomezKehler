@@ -44,8 +44,8 @@ export class ListDestinationsComponent implements OnInit {
       name: dest.name,
       country: dest.country,
       population: dest.population,
-      latitude: dest.lat,
-      longitude: dest.lon,
+      latitude: dest.latitude,
+      longitude: dest.longitude,
       imageUrl: dest.imageUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&q=80&w=800'
     }).subscribe(() => {
       alert(`${dest.name} guardado como destino popular.`);

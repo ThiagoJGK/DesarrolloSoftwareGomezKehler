@@ -22,24 +22,56 @@ namespace TourismTracking.Destinations
             _httpClientFactory = httpClientFactory;
         }
 
-        // Búsqueda Externa (Delegado a API GeoDB Cities o similar)
         public async Task<List<DestinationDto>> SearchExternalDestinationsAsync(string nameQuery, string countryCode = null)
         {
-            var client = _httpClientFactory.CreateClient("GeoDbApi");
+            var client = _httpClientFactory.CreateClient();
+            var url = $"https://geocoding-api.open-meteo.com/v1/search?name={Uri.EscapeDataString(nameQuery)}&count=10&language=en&format=json";
             
-            // Simulación o llamada real a GeoDB. En p.ej RapidAPI:
-            var url = $"/v1/geo/cities?namePrefix={nameQuery}";
-            if (!string.IsNullOrEmpty(countryCode))
+            var list = new List<DestinationDto>();
+
+            try
             {
-                url += $"&countryIds={countryCode}";
+                var response = await client.GetFromJsonAsync<OpenMeteoResponse>(url);
+                if (response?.Results != null)
+                {
+                    foreach(var r in response.Results)
+                    {
+                        if (string.IsNullOrEmpty(countryCode) || string.Equals(r.Country_Code, countryCode, StringComparison.OrdinalIgnoreCase))
+                        {
+                            list.Add(new DestinationDto
+                            {
+                                Name = r.Name,
+                                Country = r.Country ?? "Unknown", // sometimes country might be missing for some features
+                                Population = r.Population,
+                                Latitude = r.Latitude,
+                                Longitude = r.Longitude,
+                                ImageUrl = null
+                            });
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                // Return an empty list or handle error if API fails
             }
             
-            // var response = await client.GetFromJsonAsync<GeoDbResponse>(url);
-            // var mapped = MapResponseToDto(response);
-            
-            // Para fines de la estructura del Hito 2 devolvemos mock u omisión del mapeo profundo
-            var list = new List<DestinationDto>(); 
-            return await Task.FromResult(list);
+            return list;
+        }
+
+        private class OpenMeteoResponse
+        {
+            public List<OpenMeteoResult> Results { get; set; }
+        }
+
+        private class OpenMeteoResult
+        {
+            public string Name { get; set; }
+            public string Country { get; set; }
+            public string Country_Code { get; set; }
+            public int Population { get; set; }
+            public double Latitude { get; set; }
+            public double Longitude { get; set; }
         }
 
         public async Task<DestinationDto> SaveDestinationToInternalDbAsync(SaveDestinationInput input)
