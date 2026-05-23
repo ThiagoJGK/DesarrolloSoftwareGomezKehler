@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Maestro de Desarrollo, Workflow y Colaboración IA - TourismTracking</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+        :root {
+            --primary: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --dark: #0f172a;
+            --gray-light: #f8fafc;
+            --gray-border: #e2e8f0;
+            --text-main: #334155;
+            --text-dark: #0f172a;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--gray-light);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* --- Estilo de Impresión (PDF) --- */
+        @media print {
+            body {
+                background-color: #ffffff;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+                margin: 0;
+            }
+            .page-break {
+                page-break-before: always;
+                height: 0;
+                margin: 0;
+                border: none;
+            }
+            h1, h2, h3, .card, .step-box, pre {
+                page-break-inside: avoid;
+            }
+        }
+
+        /* --- Portada --- */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            min-height: 840px;
+            background: var(--dark);
+            color: #ffffff;
+            padding: 40px;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .cover-page::before {
+            content: "";
+            position: absolute;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(15,23,42,0) 60%);
+            z-index: 1;
+        }
+
+        .cover-content {
+            position: relative;
+            z-index: 2;
+            max-width: 680px;
+        }
+
+        .badge-academic {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 28px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .cover-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.85rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #ffffff, #93c5fd, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cover-subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            font-weight: 300;
+            margin-bottom: 48px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 32px;
+            text-align: left;
+        }
+
+        .meta-item {
+            font-size: 0.9rem;
+        }
+
+        .meta-label {
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .meta-val {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        /* --- Cuerpo del Documento --- */
+        .page-content {
+            padding: 64px;
+        }
+
+        .section-header {
+            margin-bottom: 36px;
+            border-bottom: 2px solid var(--gray-border);
+            padding-bottom: 12px;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.85rem;
+            color: var(--text-dark);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 .section-number {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+        }
+
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        /* --- Elementos Visuales (Cards y Alertas) --- */
+        .alert-box {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .alert-box strong {
+            color: #1e3a8a;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid var(--gray-border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- Checklists --- */
+        ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .checklist li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 12px;
+        }
+
+        .checklist li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--primary-gradient);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* --- Code Block --- */
+        pre {
+            background-color: #1e293b;
+            color: #f1f5f9;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f1f5f9;
+            color: #b91c1c;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
+            font-size: inherit;
+        }
+
+        /* --- Diagrama simplificado --- */
+        .diagram-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 28px 0;
+            padding: 16px;
+            background-color: var(--gray-light);
+            border-radius: 8px;
+            border: 1px dashed var(--gray-border);
+        }
+
+        .diagram-node {
+            flex: 1;
+            text-align: center;
+            background-color: white;
+            border: 1px solid var(--gray-border);
+            padding: 12px 6px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .diagram-arrow {
+            padding: 0 8px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- PORTADA -->
+    <div class="cover-page">
+        <div class="cover-content">
+            <span class="badge-academic">UTN - FRCU | Cátedra 2025</span>
+            <h1 class="cover-title">Manual Maestro de Desarrollo, Workflow y Colaboración IA</h1>
+            <p class="cover-subtitle">Guía de onboarding integrada para Thiago, Exequiel y la legión de asistentes inteligentes Antigravity.</p>
+            
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span class="meta-label">Materia</span>
+                    <span class="meta-val">Desarrollo de Software</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Proyecto</span>
+                    <span class="meta-val">TourismTracking (DDD Solution)</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Colaboradores</span>
+                    <span class="meta-val">Thiago J. Gomez & Exequiel</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Versión del Entorno</span>
+                    <span class="meta-val">1.0 (Rama 'dev' / ABP 8.3.4)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 1 -->
+    <div class="page-content">
+        <div class="section-header">
+            <h2><span class="section-number">01.</span> Integración al Proyecto y Onboarding</h2>
+        </div>
+        <p>¡Bienvenido al flujo de desarrollo de <strong>TourismTracking</strong>, Exequiel! Esta guía de onboarding te permitirá sincronizar tu repositorio local de Git y configurar el entorno del proyecto de forma inmediata y automática junto con tu asistente de inteligencia artificial <strong>Antigravity</strong>.</p>
+        
+        <div class="alert-box">
+            <strong>⚠️ PASO CRÍTICO PREVIO: Sincronización de Git</strong>
+            Para no pisar código y trabajar de acuerdo al plan de integración acordado, debes cambiarte a la rama compartida <code>dev</code> en tu terminal de comandos local antes de realizar cualquier cambio:
+        </div>
+        
+        <pre><code>git checkout main
+git fetch origin
+git checkout dev
+git pull --rebase origin dev</code></pre>
+
+        <h3>🚀 Preparación del Entorno del Proyecto</h3>
+        <p>Dado que cuentas con **Antigravity** instalado en tu sistema, la configuración y el levantamiento de las bases de datos y dependencias está 100% automatizado. Solo debes arrancar tu asistente en la raíz del proyecto y proporcionarle el pliego base.</p>
+
+        <div class="card">
+            <div class="card-title">📦 Checklist del Desarrollador</div>
+            <ul class="checklist">
+                <li>Sincronización completa de la rama <code>dev</code> remota en local.</li>
+                <li>Instalación e inyección global de las Skills de IA (Paso 04).</li>
+                <li>Compilación limpia del backend en .NET (<code>dotnet build</code>).</li>
+                <li>Migración y Carga de Semillas iniciales mediante <code>DbMigrator</code>.</li>
+                <li>Compilación e instalación de dependencias en Angular (<code>npm install</code>).</li>
+            </ul>
+        </div>
+    </div>
+
+    <hr class="page-break">
+
+    <!-- SECCIÓN 2 -->
+    <div class="page-content">
+        <div class="section-header">
+            <h2><span class="section-number">02.</span> El Protocolo de Colaboración Git-AI</h2>
+        </div>
+        <p>Para evitar colisiones de código y conflictos al trabajar en paralelo sobre la misma rama <code>dev</code> de integración, hemos diseñado un protocolo estricto ("Git-AI Protocol"). Este protocolo debe ser cumplido rigurosamente tanto por nosotros como por las IAs.</p>
+        
+        <div class="diagram-flow">
+            <div class="diagram-node">Pull & Rebase (dev)</div>
+            <div class="diagram-arrow">➔</div>
+            <div class="diagram-node">Validar Local (Build & Test)</div>
+            <div class="diagram-arrow">➔</div>
+            <div class="diagram-node">Commit Semántico</div>
+            <div class="diagram-arrow">➔</div>
+            <div class="diagram-node">Push Seguro (dev)</div>
+        </div>
+
+        <h3>📝 El Algoritmo de Commit y Push</h3>
+        <p>Cada vez que tu IA o tú realicen un cambio funcional en la base de código, se debe verificar localmente la estabilidad del sistema antes de subirlo a la rama remota:</p>
+
+        <pre><code># 1. Traer cambios más recientes
+git pull --rebase origin dev
+
+# 2. Compilar el Backend para asegurar que no hay errores
+dotnet build aspnet-core/TourismTracking.sln
+
+# 3. Ejecutar las pruebas unitarias y de integración
+dotnet test aspnet-core/TourismTracking.sln
+
+# 4. Crear commit semántico si todo pasa
+git add .
+git commit -m "feat(interaction): add average rating calculations"
+
+# 5. Push seguro a la rama de desarrollo
+git push origin dev</code></pre>
+
+        <div class="alert-box">
+            <strong>🔒 Protección de Producción (Rama 'prod')</strong>
+            La rama de entrega final y defensa de cátedra (<code>prod</code>) está protegida contra empujes directos. Todo despliegue a producción se realiza mediante **Pull Requests** generados automáticamente por la IA desde <code>dev</code>, previa compilación exitosa del 100% de la suite.
+        </div>
+    </div>
+
+    <hr class="page-break">
+
+    <!-- SECCIÓN 3 -->
+    <div class="page-content">
+        <div class="section-header">
+            <h2><span class="section-number">03.</span> Spec-Driven Development (SDD)</h2>
+        </div>
+        <p>El <strong>Desarrollo Guiado por Especificaciones (SDD)</strong> garantiza la sincronización perfecta y sin errores ortográficos de tipos de datos entre el Frontend (Angular) y el Backend (C# .NET) a través de la autogeneración de proxies de ABP.</p>
+
+        <div class="diagram-flow">
+            <div class="diagram-node">Definir Contrato (.Application.Contracts)</div>
+            <div class="diagram-arrow">➔</div>
+            <div class="diagram-node">Compilar Backend (dotnet build)</div>
+            <div class="diagram-arrow">➔</div>
+            <div class="diagram-node">Generar Proxies (abp generate-proxy)</div>
+        </div>
+
+        <h3>🛠️ Flujo de Trabajo Contract-First</h3>
+        <p>Queda estrictamente prohibido picar a mano llamadas <code>HttpClient</code> en Angular. El pipeline oficial a seguir por IAs y humanos es el siguiente:</p>
+        
+        <ol style="margin-left: 24px; margin-bottom: 24px;">
+            <li><strong>Contrato en C#:</strong> Define las firmas de servicio e interfaces en el proyecto <code>TourismTracking.Application.Contracts</code> (ej. <code>IDestinationAppService.cs</code>) junto con sus respectivos DTOs de entrada y salida.</li>
+            <li><strong>Compilación:</strong> Compila el backend ejecutando <code>dotnet build</code> para regenerar el catálogo de metadata.</li>
+            <li><strong>Proxy angular:</strong> Desde la terminal dentro del directorio <code>angular/</code>, ejecuta:
+                <pre><code>abp generate-proxy -t ng</code></pre>
+                Esto autogenerará los archivos TypeScript tipados en <code>angular/src/app/proxy/</code>.
+            </li>
+            <li><strong>Consumo:</strong> Inyecta el servicio generado en tu componente de Angular y consúmelo nativamente.</li>
+        </ol>
+
+        <div class="card">
+            <div class="card-title">💡 Ventajas para la Defensa Académica</div>
+            <p>Este flujo permite justificar ante los evaluadores un acoplamiento limpio de capas y el uso del patrón **Single Source of Truth** (Contrato de API único), acelerando el desarrollo en paralelo y reduciendo errores ortográficos en la comunicación de red.</p>
+        </div>
+    </div>
+
+    <hr class="page-break">
+
+    <!-- SECCIÓN 4 -->
+    <div class="page-content">
+        <div class="section-header">
+            <h2><span class="section-number">04.</span> Manual de Interacción con Antigravity</h2>
+        </div>
+        <p>Para potenciar el par-programming, debes configurar a tu asistente de IA (**Antigravity**) instalando las Skills del proyecto de forma global en tu máquina de desarrollo. Esto permitirá que la IA entienda y aplique automáticamente todas las reglas de Git y SDD explicadas en este manual.</p>
+
+        <h3>📂 Instalación de las Skills (Paso a Paso)</h3>
+        <p>Las Skills son conjuntos de instrucciones estructuradas en Markdown y configuraciones que guían de forma estricta el comportamiento del agente.</p>
+        
+        <div class="card">
+            <div class="card-title">⚙️ Procedimiento de Instalación Local</div>
+            <ol style="margin-left: 20px;">
+                <li style="margin-bottom: 12px;">Copia la carpeta <code>skills/</code> provista en este paquete de descargas (que contiene <code>git-ai-collaboration</code> y <code>spec-driven-development</code>).</li>
+                <li style="margin-bottom: 12px;">Pégala en el directorio de configuración global de Gemini en tu perfil de usuario de Windows:
+                    <pre><code>C:\Users\&lt;TuNombreUsuarioWindows&gt;\.gemini\config\skills\</code></pre>
+                </li>
+                <li style="margin-bottom: 12px;">**Listo!** Al abrir Antigravity y arrancar la sesión, el agente cargará estas directivas como habilidades de forma transparente.</li>
+            </ol>
+        </div>
+
+        <h3>🤖 Cómo alimentar a la IA con Contexto</h3>
+        <p>Una vez que te sincronices con la rama <code>dev</code> de Git e instales las skills globales, abre el chat con tu IA en el editor de código y proporciónale el siguiente prompt base para alinear sus objetivos de inmediato:</p>
+
+        <div class="alert-box" style="background-color: #f5f3ff; border-left-color: #8b5cf6;">
+            <strong>📋 Prompt de Alineación Base para la IA</strong>
+            <p style="font-size: 0.85rem; font-style: italic; margin-top: 8px; border-top: 1px solid rgba(139,92,246,0.2); padding-top: 8px;">
+                "Hola Antigravity. Estoy colaborando con Thiago en el proyecto TourismTracking. Por favor, lee meticulosamente la documentación en <code>Documentacion/README.md</code>, y accede a las skills de <code>git-ai-collaboration</code> y <code>spec-driven-development</code> que tengo instaladas. Analiza el archivo de fallos de compilación y mocks en <code>Documentacion/Reporte_Auditoria_Brechas.md</code>, y ayúdame a elaborar un plan ordenado en mi archivo <code>task.md</code> local para comenzar a corregir las tareas del frontend Angular (vinculación de botones huérfanos y promedios reales) y backend de forma segura."
+            </p>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
