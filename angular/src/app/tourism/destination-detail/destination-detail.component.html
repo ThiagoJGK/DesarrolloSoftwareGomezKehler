@@ -28,8 +28,14 @@
         </div>
         <p class="text-muted mt-2">{{ metrics?.totalReviews || 0 }} reseñas contabilizadas</p>
         <hr>
-        <button class="btn btn-outline-danger w-100 mb-2">
-          <i class="fas fa-heart me-2"></i> Agregar a Favoritos
+        <button 
+          class="btn w-100 mb-2"
+          [class.btn-danger]="isFavorite"
+          [class.btn-outline-danger]="!isFavorite"
+          [disabled]="togglingFavorite"
+          (click)="toggleFavorite()">
+          <i class="fas fa-heart me-2"></i>
+          {{ isFavorite ? 'Quitar de Favoritos' : 'Agregar a Favoritos' }}
         </button>
       </div>
     </div>
@@ -44,12 +50,39 @@
       <div class="mb-4">
         <div class="card mb-3 shadow-sm border-0" *ngFor="let rev of reviews">
           <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <h6 class="fw-bold"><i class="fas fa-user-circle me-1"></i> Usuario Anónimo</h6>
-              <span class="badge bg-warning text-dark"><i class="fas fa-star"></i> {{ rev.rating }}</span>
+            <!-- Modo visualización -->
+            <div *ngIf="editingReviewId !== rev.id">
+              <div class="d-flex justify-content-between">
+                <h6 class="fw-bold"><i class="fas fa-user-circle me-1"></i> Usuario {{ (rev.userId || '').substring(0, 8) }}...</h6>
+                <span class="badge bg-warning text-dark"><i class="fas fa-star"></i> {{ rev.rating }}</span>
+              </div>
+              <p class="card-text mt-2">{{ rev.comment }}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">ID: {{ (rev.userId || '').substring(0, 8) }}</small>
+                <div>
+                  <button class="btn btn-sm btn-outline-primary me-1" (click)="startEditReview(rev)" title="Editar reseña">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteReview(rev.id || '')" title="Eliminar reseña">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
             </div>
-            <p class="card-text mt-2">{{ rev.comment }}</p>
-            <small class="text-muted">Fecha: {{ rev.lastModificationTime || rev.creationTime | date }}</small>
+            <!-- Modo edición -->
+            <div *ngIf="editingReviewId === rev.id">
+              <h6 class="fw-bold text-primary"><i class="fas fa-edit me-1"></i> Editando Reseña</h6>
+              <div class="mb-2">
+                <label class="form-label">Estrellas (1-5)</label>
+                <input type="number" class="form-control w-25" min="1" max="5" [(ngModel)]="editReviewData.rating">
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Comentario</label>
+                <textarea class="form-control" rows="2" [(ngModel)]="editReviewData.comment"></textarea>
+              </div>
+              <button class="btn btn-sm btn-success me-1" (click)="saveEditReview()"><i class="fas fa-check"></i> Guardar</button>
+              <button class="btn btn-sm btn-secondary" (click)="cancelEditReview()"><i class="fas fa-times"></i> Cancelar</button>
+            </div>
           </div>
         </div>
         <div class="alert alert-secondary" *ngIf="reviews.length === 0">No hay reseñas para mostrar. ¡Sé el primero!</div>

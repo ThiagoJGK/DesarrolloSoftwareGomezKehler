@@ -40,11 +40,23 @@
               </thead>
               <tbody>
                 <tr *ngFor="let exp of myExperiences">
-                  <td class="fw-semibold">{{ exp.title }}</td>
-                  <td>{{ exp.keywords }}</td>
+                  <td class="fw-semibold">
+                    <span *ngIf="editingExperienceId !== exp.id">{{ exp.title }}</span>
+                    <input *ngIf="editingExperienceId === exp.id" type="text" class="form-control form-control-sm" [(ngModel)]="editExperienceData.title">
+                  </td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                    <span *ngIf="editingExperienceId !== exp.id">{{ exp.keywords }}</span>
+                    <input *ngIf="editingExperienceId === exp.id" type="text" class="form-control form-control-sm" [(ngModel)]="editExperienceData.keywords">
+                  </td>
+                  <td>
+                    <ng-container *ngIf="editingExperienceId !== exp.id">
+                      <button class="btn btn-sm btn-outline-primary me-2" (click)="startEditExperience(exp)"><i class="fas fa-edit"></i></button>
+                      <button class="btn btn-sm btn-outline-danger" (click)="deleteExperience(exp.id || '')"><i class="fas fa-trash"></i></button>
+                    </ng-container>
+                    <ng-container *ngIf="editingExperienceId === exp.id">
+                      <button class="btn btn-sm btn-success me-1" (click)="saveEditExperience()"><i class="fas fa-check"></i></button>
+                      <button class="btn btn-sm btn-secondary" (click)="cancelEditExperience()"><i class="fas fa-times"></i></button>
+                    </ng-container>
                   </td>
                 </tr>
                 <tr *ngIf="myExperiences.length === 0">

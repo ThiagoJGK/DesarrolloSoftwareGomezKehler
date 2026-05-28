@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DestinationService } from '../../proxy/destinations/destination.service';
+import { TourismInteractionService } from '../../proxy/experiences/tourism-interaction.service';
 import { DestinationDto } from '../../proxy/destinations/models';
 import { RouterModule } from '@angular/router';
 
@@ -18,7 +19,13 @@ export class ListDestinationsComponent implements OnInit {
   popularDestinations: DestinationDto[] = [];
   isSearching = false;
 
-  constructor(private destinationService: DestinationService) { }
+  // Map de métricas por destination ID
+  destinationRatings: { [id: string]: { avg: number; total: number } } = {};
+
+  constructor(
+    private destinationService: DestinationService,
+    private interactionService: TourismInteractionService
+  ) { }
 
   ngOnInit(): void {
     this.loadPopularDestinations();
@@ -27,7 +34,24 @@ export class ListDestinationsComponent implements OnInit {
   loadPopularDestinations() {
     this.destinationService.getSavedDestinations().subscribe((res) => {
       this.popularDestinations = res;
+      // Cargar métricas dinámicas para cada destino
+      res.forEach(dest => {
+        if (dest.id) {
+          this.interactionService.getDestinationAverageRating(dest.id).subscribe(metrics => {
+            this.destinationRatings[dest.id!] = {
+              avg: metrics.averageRating,
+              total: metrics.totalReviews
+            };
+          });
+        }
+      });
     });
+  }
+
+  getDestinationRating(id: string | undefined): string {
+    if (!id || !this.destinationRatings[id]) return 'Sin datos';
+    const r = this.destinationRatings[id];
+    return `⭐ ${r.avg.toFixed(1)} (${r.total})`;
   }
 
   search() {

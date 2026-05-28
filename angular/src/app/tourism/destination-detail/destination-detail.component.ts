@@ -20,9 +20,16 @@ export class DestinationDetailComponent implements OnInit {
   metrics: DestinationMetricsDto | undefined;
   reviews: ReviewDto[] = [];
   experiences: ExperienceDto[] = [];
-  
+
   newReview = { rating: 5, comment: '' };
   newExperience = { title: '', content: '', keywords: '' };
+
+  isFavorite = false;
+  togglingFavorite = false;
+
+  // Estado de edición de reseña
+  editingReviewId: string | null = null;
+  editReviewData = { rating: 5, comment: '' };
 
   constructor(
     private route: ActivatedRoute,
@@ -37,6 +44,7 @@ export class DestinationDetailComponent implements OnInit {
         this.loadDestinationDetails();
         this.loadMetricsAndReviews();
         this.loadExperiences();
+        this.checkIfFavorite();
       }
     });
   }
@@ -56,10 +64,61 @@ export class DestinationDetailComponent implements OnInit {
     this.interactionService.getExperiencesByDestination(this.destinationId).subscribe(e => this.experiences = e);
   }
 
+  checkIfFavorite() {
+    this.interactionService.getMyFavoriteDestinations().subscribe(favIds => {
+      this.isFavorite = favIds.includes(this.destinationId);
+    });
+  }
+
+  toggleFavorite() {
+    this.togglingFavorite = true;
+    if (this.isFavorite) {
+      this.interactionService.removeFromFavorites(this.destinationId).subscribe({
+        next: () => {
+          this.isFavorite = false;
+          this.togglingFavorite = false;
+        },
+        error: () => this.togglingFavorite = false
+      });
+    } else {
+      this.interactionService.addToFavorites(this.destinationId).subscribe({
+        next: () => {
+          this.isFavorite = true;
+          this.togglingFavorite = false;
+        },
+        error: () => this.togglingFavorite = false
+      });
+    }
+  }
+
   submitActionReview() {
     if (!this.newReview.comment) return;
     this.interactionService.addReview(this.destinationId, this.newReview.rating, this.newReview.comment).subscribe(() => {
       this.newReview.comment = '';
+      this.loadMetricsAndReviews();
+    });
+  }
+
+  startEditReview(rev: ReviewDto) {
+    this.editingReviewId = rev.id || null;
+    this.editReviewData = { rating: rev.rating, comment: rev.comment || '' };
+  }
+
+  cancelEditReview() {
+    this.editingReviewId = null;
+  }
+
+  saveEditReview() {
+    if (!this.editingReviewId) return;
+    this.interactionService.editReview(this.editingReviewId, this.editReviewData.rating, this.editReviewData.comment).subscribe(() => {
+      this.editingReviewId = null;
+      this.loadMetricsAndReviews();
+    });
+  }
+
+  deleteReview(reviewId: string) {
+    if (!confirm('¿Estás seguro de eliminar esta reseña?')) return;
+    this.interactionService.deleteReview(reviewId).subscribe(() => {
       this.loadMetricsAndReviews();
     });
   }

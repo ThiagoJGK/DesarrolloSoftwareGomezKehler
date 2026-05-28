@@ -6,6 +6,7 @@ using Volo.Abp.Domain.Repositories;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace TourismTracking.Destinations
 {
@@ -53,7 +54,7 @@ namespace TourismTracking.Destinations
             }
             catch(Exception ex)
             {
-                // Return an empty list or handle error if API fails
+                Logger.LogError(ex, "Error al consultar la API externa Open-Meteo para la consulta: {Query}", nameQuery);
             }
             
             return list;

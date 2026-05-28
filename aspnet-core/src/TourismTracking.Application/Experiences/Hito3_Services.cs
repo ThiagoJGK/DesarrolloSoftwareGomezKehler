@@ -70,7 +70,7 @@ namespace TourismTracking.Experiences
         public async Task DeleteReviewAsync(Guid reviewId)
         {
             var review = await _reviewRepo.GetAsync(reviewId);
-            if (review.CreatorId != _currentUser.Id) throw new UnauthorizedAccessException("Cannot delete someone else's review");
+            if (review.UserId != _currentUser.Id) throw new UnauthorizedAccessException("Cannot delete someone else's review");
             await _reviewRepo.DeleteAsync(reviewId);
         }
 
@@ -103,6 +103,7 @@ namespace TourismTracking.Experiences
             var exp = await _experienceRepo.GetAsync(experienceId);
             if (exp.UserId != _currentUser.Id) throw new UnauthorizedAccessException();
             exp.UpdateDetails(title, content, keywords);
+            await _experienceRepo.UpdateAsync(exp);
             return ObjectMapper.Map<Experience, ExperienceDto>(exp);
         }
 
