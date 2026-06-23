@@ -6,6 +6,7 @@ import { DestinationService } from '../../proxy/destinations/destination.service
 import { DestinationDto } from '../../proxy/destinations/models';
 import { TourismInteractionService } from '../../proxy/experiences/tourism-interaction.service';
 import { ReviewDto, ExperienceDto, DestinationMetricsDto } from '../../proxy/experiences/models';
+import { TourismUserService } from '../../proxy/users/tourism-user.service';
 
 @Component({
   selector: 'app-destination-detail',
@@ -31,10 +32,14 @@ export class DestinationDetailComponent implements OnInit {
   editingReviewId: string | null = null;
   editReviewData = { rating: 5, comment: '' };
 
+  selectedUserProfile: any = null;
+  showProfileModal = false;
+
   constructor(
     private route: ActivatedRoute,
     private destinationService: DestinationService,
-    private interactionService: TourismInteractionService
+    private interactionService: TourismInteractionService,
+    private tourismUserService: TourismUserService
   ) {}
 
   ngOnInit(): void {
@@ -129,5 +134,24 @@ export class DestinationDetailComponent implements OnInit {
       this.newExperience = { title: '', content: '', keywords: '' };
       this.loadExperiences();
     });
+  }
+
+  viewPublicProfile(userId: string) {
+    if (!userId) return;
+    this.tourismUserService.getPublicProfile(userId).subscribe({
+      next: (profile) => {
+        this.selectedUserProfile = profile;
+        this.showProfileModal = true;
+      },
+      error: (err) => {
+        alert('No se pudo cargar el perfil del usuario.');
+        console.error(err);
+      }
+    });
+  }
+
+  closeProfileModal() {
+    this.showProfileModal = false;
+    this.selectedUserProfile = null;
   }
 }

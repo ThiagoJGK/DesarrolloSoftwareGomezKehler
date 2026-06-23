@@ -158,5 +158,5 @@ namespace TourismTracking.Experiences
 
     public class ReviewDto { public Guid Id { get; set; } public int Rating { get; set; } public string Comment { get; set; } public Guid UserId { get; set; } }
     public class DestinationMetricsDto { public double AverageRating { get; set; } public int TotalReviews { get; set; } }
-    public class ExperienceDto { public Guid Id { get; set; } public string Title { get; set; } public string Content { get; set; } public string Keywords { get; set; } }
+    public class ExperienceDto { public Guid Id { get; set; } public Guid DestinationId { get; set; } public Guid UserId { get; set; } public string Title { get; set; } public string Content { get; set; } public string Keywords { get; set; } }
 }

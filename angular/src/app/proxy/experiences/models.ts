@@ -6,6 +6,8 @@ export interface DestinationMetricsDto {
 
 export interface ExperienceDto {
   id?: string;
+  destinationId?: string;
+  userId?: string;
   title?: string;
   content?: string;
   keywords?: string;
