@@ -73,6 +73,12 @@
         <i class="fas fa-heart me-2 text-danger"></i> Mis Favoritos
       </a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'notifications'" href="javascript:void(0)" (click)="setTab('notifications')">
+        <i class="fas fa-bell me-2" [class.text-warning]="unreadNotificationsCount > 0"></i> Notificaciones
+        <span class="badge bg-danger rounded-pill ms-1" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
+      </a>
+    </li>
     <li class="nav-item" *ngIf="isAdmin">
       <a class="nav-link text-success fw-bold" [class.active]="activeTab === 'admin'" href="javascript:void(0)" (click)="setTab('admin')">
         <i class="fas fa-chart-line me-2"></i> Métricas API (Admin)
@@ -148,36 +154,187 @@
       </div>
     </div>
 
-    <!-- Tab Admin -->
+    <!-- Tab Notificaciones -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'notifications'" [class.active]="activeTab === 'notifications'" *ngIf="activeTab === 'notifications'">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="card-title mb-0 fw-bold text-dark"><i class="fas fa-bell text-warning me-2"></i>Centro de Notificaciones</h4>
+            <button class="btn btn-outline-primary btn-sm" (click)="markAllAsRead()" [disabled]="unreadNotificationsCount === 0">
+              <i class="fas fa-check-double me-1"></i> Marcar todas como leídas
+            </button>
+          </div>
+          
+          <div class="list-group">
+            <div class="list-group-item list-group-item-action flex-column align-items-start border-start border-4 mb-2 shadow-sm rounded"
+                 [class.border-warning]="!notif.isRead"
+                 [class.border-light]="notif.isRead"
+                 [class.bg-light]="notif.isRead"
+                 *ngFor="let notif of notifications">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1 fw-bold text-dark">{{ notif.title }}</h5>
+                <small class="text-muted">{{ notif.creationTime | date:'dd/MM/yyyy HH:mm' }}</small>
+              </div>
+              <p class="mb-2 text-muted">{{ notif.message }}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="badge bg-success me-1" *ngIf="notif.isRead">Leída</span>
+                  <span class="badge bg-warning text-dark" *ngIf="!notif.isRead">Nueva</span>
+                </div>
+                <button class="btn btn-sm btn-link p-0 text-decoration-none text-primary fw-semibold" *ngIf="!notif.isRead" (click)="markAsRead(notif.id)">
+                  <i class="fas fa-envelope-open me-1"></i> Marcar como leída
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-secondary text-center py-4" *ngIf="notifications.length === 0">No tienes notificaciones en este momento.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Admin (Métricas y Reportes Dinámicos) -->
     <div class="tab-pane fade" [class.show]="activeTab === 'admin'" [class.active]="activeTab === 'admin'" *ngIf="activeTab === 'admin' && isAdmin">
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="card text-white bg-success shadow-sm h-100">
-            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
-              <h1 class="display-3 fw-bold">142</h1>
-              <h5 class="card-title">LLamadas API GeoDB Cities</h5>
-              <p class="card-text opacity-75">Últimos 30 días</p>
+      
+      <!-- Panel de Estadísticas Generales -->
+      <div class="row g-3 mb-4" *ngIf="systemStats">
+        <div class="col-md-4">
+          <div class="card bg-primary text-white border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <i class="fas fa-users fa-3x me-3 opacity-75"></i>
+              <div>
+                <h6 class="card-title mb-1 opacity-75">Total de Usuarios</h6>
+                <h3 class="fw-bold mb-0">{{ systemStats.totalUsers }}</h3>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-6 mb-4">
-          <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-              <h5 class="card-title text-success"><i class="fas fa-server me-2"></i>Estado de Workers</h5>
-              <ul class="list-group list-group-flush mt-3">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  Sincronización de Destinos
-                  <span class="badge bg-success rounded-pill">Activo (Diario)</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  Búsqueda Ticketmaster API
-                  <span class="badge bg-success rounded-pill">Activo (Idle)</span>
-                </li>
-              </ul>
+        <div class="col-md-4">
+          <div class="card bg-success text-white border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <i class="fas fa-book-open fa-3x me-3 opacity-75"></i>
+              <div>
+                <h6 class="card-title mb-1 opacity-75">Experiencias Creadas</h6>
+                <h3 class="fw-bold mb-0">{{ systemStats.totalExperiences }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-info text-white border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <i class="fas fa-map-marked-alt fa-3x me-3 opacity-75"></i>
+              <div>
+                <h6 class="card-title mb-1 opacity-75">Destinos Guardados</h6>
+                <h3 class="fw-bold mb-0">{{ systemStats.totalSavedDestinations }}</h3>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Resumen de Consumo de APIs Externas -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0"><i class="fas fa-network-wired text-primary me-2"></i>Consumo de APIs Externas</h5>
+            <button class="btn btn-sm btn-outline-success" (click)="exportReport()" [disabled]="exportingMetrics">
+              <i class="fas fa-download me-1"></i> {{ exportingMetrics ? 'Exportando...' : 'Descargar Reporte CSV' }}
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>API Externa</th>
+                  <th>Total Llamadas</th>
+                  <th>Exitosas</th>
+                  <th>Fallidas</th>
+                  <th>Tiempo Resp. Promedio</th>
+                  <th>Tasa de Éxito</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let summary of apiUsageSummary">
+                  <td class="fw-bold">{{ summary.apiName }}</td>
+                  <td>{{ summary.totalCalls }}</td>
+                  <td class="text-success">{{ summary.successCalls }}</td>
+                  <td class="text-danger">{{ summary.failedCalls }}</td>
+                  <td>{{ summary.averageResponseTimeMs }} ms</td>
+                  <td>
+                    <span class="badge" [class.bg-success]="summary.successRate >= 90" [class.bg-warning]="summary.successRate >= 70 && summary.successRate < 90" [class.bg-danger]="summary.successRate < 70">
+                      {{ summary.successRate }}%
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="apiUsageSummary.length === 0">
+                  <td colspan="6" class="text-center text-muted">No se registran llamadas a APIs externas aún.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Destinos Más Reseñados -->
+        <div class="col-md-6 mb-4" *ngIf="systemStats">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h5 class="fw-bold text-dark mb-3"><i class="fas fa-star text-warning me-2"></i>Destinos Más Reseñados</h5>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Destino</th>
+                      <th>Reseñas</th>
+                      <th>Rating Promedio</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let d of systemStats.mostReviewedDestinations">
+                      <td>
+                        <span class="fw-semibold text-dark">{{ d.destinationName }}</span><br>
+                        <small class="text-muted">{{ d.country }}</small>
+                      </td>
+                      <td>{{ d.reviewsCount }}</td>
+                      <td class="text-warning fw-bold">⭐ {{ d.averageRating }}</td>
+                    </tr>
+                    <tr *ngIf="systemStats.mostReviewedDestinations.length === 0">
+                      <td colspan="3" class="text-center text-muted">No hay reseñas registradas aún.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registro de Llamadas Recientes (Últimas 10) -->
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h5 class="fw-bold text-dark mb-3"><i class="fas fa-history text-secondary me-2"></i>Monitoreo en Vivo (Llamadas Recientes)</h5>
+              <div class="list-group list-group-flush" style="max-height: 350px; overflow-y: auto;">
+                <div class="list-group-item px-0 py-2 border-bottom" *ngFor="let call of recentApiCalls.slice(0,10)">
+                  <div class="d-flex w-100 justify-content-between align-items-center">
+                    <span class="badge" [class.bg-success]="call.isSuccess" [class.bg-danger]="!call.isSuccess">
+                      {{ call.apiName }}
+                    </span>
+                    <small class="text-muted">{{ call.creationTime | date:'HH:mm:ss' }}</small>
+                  </div>
+                  <p class="mb-1 text-truncate small mt-1 text-dark" style="max-width: 100%;">{{ call.endpoint }}</p>
+                  <div class="d-flex justify-content-between">
+                    <small class="text-muted"><i class="fas fa-stopwatch me-1"></i>{{ call.responseTimeMs }} ms</small>
+                    <small class="text-danger fw-semibold" *ngIf="!call.isSuccess">{{ call.errorMessage }}</small>
+                  </div>
+                </div>
+                <div class="text-center text-muted py-4" *ngIf="recentApiCalls.length === 0">No hay llamadas recientes registradas.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>

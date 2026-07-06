@@ -15,6 +15,8 @@ using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using TourismTracking.Destinations;
 using TourismTracking.Experiences;
+using TourismTracking.Notifications;
+using TourismTracking.Metrics;
 
 namespace TourismTracking.EntityFrameworkCore;
 
@@ -31,6 +33,8 @@ public class TourismTrackingDbContext :
     public DbSet<Experience> Experiences { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<FavoriteListItem> Favorites { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<ApiMetric> ApiMetrics { get; set; }
 
     #region Entities from the modules
 
@@ -99,6 +103,16 @@ public class TourismTrackingDbContext :
 
         builder.Entity<FavoriteListItem>(b => {
             b.ToTable("AppFavorites");
+            b.ConfigureByConvention();
+        });
+
+        builder.Entity<Notification>(b => {
+            b.ToTable("AppNotifications");
+            b.ConfigureByConvention();
+        });
+
+        builder.Entity<ApiMetric>(b => {
+            b.ToTable("AppApiMetrics");
             b.ConfigureByConvention();
         });
     }

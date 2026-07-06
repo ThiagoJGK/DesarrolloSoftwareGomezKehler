@@ -8,6 +8,9 @@ using Volo.Abp.Users;
 using Xunit;
 using TourismTracking.Experiences;
 using System.Linq;
+using Volo.Abp.DependencyInjection;
+using Volo.Abp.ObjectMapping;
+using Volo.Abp.Guids;
 
 namespace TourismTracking.Application.Tests.Experiences
 {
@@ -26,12 +29,25 @@ namespace TourismTracking.Application.Tests.Experiences
             _favoritesRepo = Substitute.For<IRepository<FavoriteListItem, Guid>>();
             _currentUser = Substitute.For<ICurrentUser>();
 
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            
+            var objectMapper = new SimpleTestObjectMapper();
+            
+            var guidGenerator = Substitute.For<IGuidGenerator>();
+            guidGenerator.Create().Returns(Guid.NewGuid());
+
+            serviceProvider.GetService(typeof(IObjectMapper)).Returns(objectMapper);
+            serviceProvider.GetService(typeof(IGuidGenerator)).Returns(guidGenerator);
+
+            var lazyServiceProvider = new AbpLazyServiceProvider(serviceProvider);
+
             _appService = new TourismInteractionAppService(
                 _reviewRepo,
                 _experienceRepo,
                 _favoritesRepo,
                 _currentUser
             );
+            _appService.LazyServiceProvider = lazyServiceProvider;
         }
 
         [Fact]
@@ -198,6 +214,42 @@ namespace TourismTracking.Application.Tests.Experiences
             {
                 await _appService.CreateExperienceAsync(Guid.NewGuid(), "Title", "Content", "tags");
             });
+        }
+
+        [Fact]
+        public async Task AddReviewAsync_Should_Create_Review_Successfully()
+        {
+            // Arrange
+            var currentUserId = Guid.NewGuid();
+            var destinationId = Guid.NewGuid();
+            _currentUser.Id.Returns(currentUserId);
+
+            // Act
+            var result = await _appService.AddReviewAsync(destinationId, 5, "Excelente destino");
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.Rating.ShouldBe(5);
+            result.Comment.ShouldBe("Excelente destino");
+            await _reviewRepo.Received(1).InsertAsync(Arg.Any<Review>());
+        }
+
+        [Fact]
+        public async Task AddToFavoritesAsync_Should_Add_If_Not_Exists()
+        {
+            // Arrange
+            var currentUserId = Guid.NewGuid();
+            var destinationId = Guid.NewGuid();
+            _currentUser.Id.Returns(currentUserId);
+            
+            _favoritesRepo.AnyAsync(Arg.Any<System.Linq.Expressions.Expression<Func<FavoriteListItem, bool>>>())
+                .Returns(Task.FromResult(false));
+
+            // Act
+            await _appService.AddToFavoritesAsync(destinationId);
+
+            // Assert
+            await _favoritesRepo.Received(1).InsertAsync(Arg.Any<FavoriteListItem>());
         }
     }
 }

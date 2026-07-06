@@ -1,25 +1,28 @@
+import type { PublicUserProfileDto } from './models';
+import { RestService, Rest } from '@abp/ng.core';
 import { Injectable } from '@angular/core';
-import { RestService } from '@abp/ng.core';
-import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TourismUserService {
-  constructor(private restService: RestService) {}
+  apiName = 'Default';
+  
 
-  getPublicProfile(userId: string): Observable<any> {
-    return this.restService.request<any, any>({
-      method: 'GET',
-      url: `/api/app/tourism-user/public-profile`,
-      params: { userId }
-    });
-  }
-
-  deleteMyAccount(): Observable<void> {
-    return this.restService.request<any, void>({
+  deleteMyAccount = (config?: Partial<Rest.Config>) =>
+    this.restService.request<any, void>({
       method: 'DELETE',
-      url: `/api/app/tourism-user/my-account`
-    });
-  }
+      url: '/api/app/tourism-user/my-account',
+    },
+    { apiName: this.apiName,...config });
+  
+
+  getPublicProfile = (userId: string, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, PublicUserProfileDto>({
+      method: 'GET',
+      url: `/api/app/tourism-user/public-profile/${userId}`,
+    },
+    { apiName: this.apiName,...config });
+
+  constructor(private restService: RestService) {}
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Users;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TourismTracking.Experiences
 {
@@ -22,6 +23,7 @@ namespace TourismTracking.Experiences
         Task<ExperienceDto> EditExperienceAsync(Guid experienceId, string title, string content, string keywords);
         Task DeleteExperienceAsync(Guid experienceId);
         Task<List<ExperienceDto>> GetExperiencesByDestinationAsync(Guid destinationId, string keywordFilter = null);
+        Task<List<ExperienceDto>> GetMyExperiencesAsync();
         
         // Operaciones de Favoritos
         Task AddToFavoritesAsync(Guid destinationId);
@@ -29,6 +31,7 @@ namespace TourismTracking.Experiences
         Task<List<Guid>> GetMyFavoriteDestinationsAsync();
     }
 
+    [Authorize]
     public class TourismInteractionAppService : ApplicationService, ITourismInteractionAppService
     {
         private readonly IRepository<Review, Guid> _reviewRepo;
@@ -123,7 +126,15 @@ namespace TourismTracking.Experiences
             {
                 filtered = filtered.Where(e => e.Keywords.Contains(keywordFilter));
             }
-            return ObjectMapper.Map<List<Experience>, List<ExperienceDto>>(filtered.ToList());
+            return ObjectMapper.Map<List<Experience>, List<ExperienceDto>>(await AsyncExecuter.ToListAsync(filtered));
+        }
+
+        public async Task<List<ExperienceDto>> GetMyExperiencesAsync()
+        {
+            var userId = _currentUser.Id ?? throw new UnauthorizedAccessException("Must be logged in.");
+            var query = await _experienceRepo.GetQueryableAsync();
+            var filtered = query.Where(e => e.UserId == userId);
+            return ObjectMapper.Map<List<Experience>, List<ExperienceDto>>(await AsyncExecuter.ToListAsync(filtered));
         }
 
         // --- Favorites ---

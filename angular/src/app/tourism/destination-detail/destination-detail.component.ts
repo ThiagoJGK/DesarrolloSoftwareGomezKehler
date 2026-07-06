@@ -7,6 +7,7 @@ import { DestinationDto } from '../../proxy/destinations/models';
 import { TourismInteractionService } from '../../proxy/experiences/tourism-interaction.service';
 import { ReviewDto, ExperienceDto, DestinationMetricsDto } from '../../proxy/experiences/models';
 import { TourismUserService } from '../../proxy/users/tourism-user.service';
+import { ConfigStateService } from '@abp/ng.core';
 
 @Component({
   selector: 'app-destination-detail',
@@ -25,6 +26,11 @@ export class DestinationDetailComponent implements OnInit {
   newReview = { rating: 5, comment: '' };
   newExperience = { title: '', content: '', keywords: '' };
 
+  currentUserId: string | undefined = '';
+  allReviews: ReviewDto[] = [];
+  selectedRatingFilter: 'all' | 'positive' | 'neutral' | 'negative' = 'all';
+  experienceKeywordFilter = '';
+
   isFavorite = false;
   togglingFavorite = false;
 
@@ -39,10 +45,12 @@ export class DestinationDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private destinationService: DestinationService,
     private interactionService: TourismInteractionService,
-    private tourismUserService: TourismUserService
+    private tourismUserService: TourismUserService,
+    private configState: ConfigStateService
   ) {}
 
   ngOnInit(): void {
+    this.currentUserId = this.configState.getOne('currentUser')?.id;
     this.route.paramMap.subscribe(params => {
       this.destinationId = params.get('id') || '';
       if (this.destinationId) {
@@ -62,11 +70,31 @@ export class DestinationDetailComponent implements OnInit {
 
   loadMetricsAndReviews() {
     this.interactionService.getDestinationAverageRating(this.destinationId).subscribe(m => this.metrics = m);
-    this.interactionService.getDestinationReviews(this.destinationId).subscribe(r => this.reviews = r);
+    this.interactionService.getDestinationReviews(this.destinationId).subscribe(r => {
+      this.allReviews = r;
+      this.applyReviewsFilter();
+    });
+  }
+
+  applyReviewsFilter() {
+    if (this.selectedRatingFilter === 'all') {
+      this.reviews = this.allReviews;
+    } else if (this.selectedRatingFilter === 'positive') {
+      this.reviews = this.allReviews.filter(r => r.rating >= 4);
+    } else if (this.selectedRatingFilter === 'neutral') {
+      this.reviews = this.allReviews.filter(r => r.rating === 3);
+    } else if (this.selectedRatingFilter === 'negative') {
+      this.reviews = this.allReviews.filter(r => r.rating <= 2);
+    }
+  }
+
+  setRatingFilter(filter: 'all' | 'positive' | 'neutral' | 'negative') {
+    this.selectedRatingFilter = filter;
+    this.applyReviewsFilter();
   }
 
   loadExperiences() {
-    this.interactionService.getExperiencesByDestination(this.destinationId).subscribe(e => this.experiences = e);
+    this.interactionService.getExperiencesByDestination(this.destinationId, this.experienceKeywordFilter || undefined).subscribe(e => this.experiences = e);
   }
 
   checkIfFavorite() {

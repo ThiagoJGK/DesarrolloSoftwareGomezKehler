@@ -11,5 +11,7 @@ public class TourismTrackingApplicationAutoMapperProfile : Profile
         CreateMap<Destination, DestinationDto>();
         CreateMap<Review, ReviewDto>();
         CreateMap<Experience, ExperienceDto>();
+        CreateMap<Notifications.Notification, Notifications.NotificationDto>();
+        CreateMap<Metrics.ApiMetric, Metrics.ApiMetricDto>();
     }
 }

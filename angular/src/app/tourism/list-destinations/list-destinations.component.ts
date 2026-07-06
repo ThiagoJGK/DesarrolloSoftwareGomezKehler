@@ -15,6 +15,9 @@ import { RouterModule } from '@angular/router';
 })
 export class ListDestinationsComponent implements OnInit {
   searchQuery = '';
+  countryFilter = '';
+  regionFilter = '';
+  minPopulationFilter: number | null = null;
   searchResults: DestinationDto[] = [];
   popularDestinations: DestinationDto[] = [];
   isSearching = false;
@@ -57,7 +60,12 @@ export class ListDestinationsComponent implements OnInit {
   search() {
     if (!this.searchQuery) return;
     this.isSearching = true;
-    this.destinationService.searchExternalDestinations(this.searchQuery, null).subscribe((res) => {
+    this.destinationService.searchExternalDestinations(
+      this.searchQuery,
+      this.countryFilter || null,
+      this.regionFilter || null,
+      this.minPopulationFilter || null
+    ).subscribe((res) => {
       this.searchResults = res;
       this.isSearching = false;
     });

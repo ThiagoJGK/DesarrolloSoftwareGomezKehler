@@ -17,6 +17,32 @@
             <i class="fas fa-search me-2"></i> {{ isSearching ? 'Buscando...' : 'Buscar' }}
           </button>
         </div>
+
+        <!-- Filtros Avanzados -->
+        <div class="text-start mt-3">
+          <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilters" aria-expanded="false" aria-controls="advancedFilters">
+            <i class="fas fa-sliders-h me-1"></i> Filtros Avanzados
+          </button>
+          <div class="collapse mt-2" id="advancedFilters">
+            <div class="card card-body bg-dark text-white border-secondary p-3">
+              <div class="row g-2">
+                <div class="col-md-4">
+                  <label class="form-label small mb-1">País (Código 2 letras)</label>
+                  <input type="text" class="form-control form-control-sm bg-secondary text-white border-0" placeholder="Ej. AR, US, ES" [(ngModel)]="countryFilter" maxlength="2">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small mb-1">Región / Provincia</label>
+                  <input type="text" class="form-control form-control-sm bg-secondary text-white border-0" placeholder="Ej. Entre Rios, California" [(ngModel)]="regionFilter">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small mb-1">Población Mínima</label>
+                  <input type="number" class="form-control form-control-sm bg-secondary text-white border-0" placeholder="Ej. 100000" [(ngModel)]="minPopulationFilter">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
