@@ -6,15 +6,15 @@
     <p class="lead text-muted mb-4">
       Bienvenido a tu plataforma de seguimiento de destinos turísticos. Busca los mejores lugares en el mundo, guárdalos en tus favoritos y registra tus propias experiencias de viaje.
     </p>
-    <div class="d-flex gap-3">
+    <div class="d-flex flex-wrap gap-3">
+      <a routerLink="/tourism" class="btn btn-primary btn-lg px-4 shadow-sm">
+        <i class="fa fa-globe me-2"></i> Explorar Destinos
+      </a>
       @if(!hasLoggedIn) {
-        <button (click)="login()" class="btn btn-primary btn-lg px-4 shadow-sm">
+        <button (click)="login()" class="btn btn-outline-primary btn-lg px-4">
           <i class="fa fa-sign-in me-2"></i> Iniciar Sesión
         </button>
       } @else {
-        <a routerLink="/tourism" class="btn btn-primary btn-lg px-4 shadow-sm">
-          <i class="fa fa-globe me-2"></i> Explorar Destinos
-        </a>
         <a routerLink="/tourism/dashboard" class="btn btn-outline-primary btn-lg px-4">
           <i class="fa fa-user me-2"></i> Mi Tablero
         </a>
@@ -22,7 +22,6 @@
     </div>
   </div>
   <div class="col-lg-6 text-center d-none d-lg-block">
-    <!-- Una imagen ilustrativa o ícono gigante -->
     <i class="fa fa-compass" style="font-size: 15rem; color: #e9ecef;"></i>
   </div>
 </div>

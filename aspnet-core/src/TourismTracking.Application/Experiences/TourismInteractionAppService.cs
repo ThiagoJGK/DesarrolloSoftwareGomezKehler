@@ -9,29 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace TourismTracking.Experiences
 {
-    public interface ITourismInteractionAppService : IApplicationService
-    {
-        // CRUD Reseñas (Reviews)
-        Task<ReviewDto> AddReviewAsync(Guid destinationId, int rating, string comment);
-        Task<ReviewDto> EditReviewAsync(Guid reviewId, int rating, string comment);
-        Task DeleteReviewAsync(Guid reviewId);
-        Task<DestinationMetricsDto> GetDestinationAverageRatingAsync(Guid destinationId);
-        Task<List<ReviewDto>> GetDestinationReviewsAsync(Guid destinationId);
-
-        // CRUD Experiencias
-        Task<ExperienceDto> CreateExperienceAsync(Guid destinationId, string title, string content, string keywords);
-        Task<ExperienceDto> EditExperienceAsync(Guid experienceId, string title, string content, string keywords);
-        Task DeleteExperienceAsync(Guid experienceId);
-        Task<List<ExperienceDto>> GetExperiencesByDestinationAsync(Guid destinationId, string keywordFilter = null);
-        Task<List<ExperienceDto>> GetMyExperiencesAsync();
-        
-        // Operaciones de Favoritos
-        Task AddToFavoritesAsync(Guid destinationId);
-        Task RemoveFromFavoritesAsync(Guid destinationId);
-        Task<List<Guid>> GetMyFavoriteDestinationsAsync();
-    }
-
-    [Authorize]
     public class TourismInteractionAppService : ApplicationService, ITourismInteractionAppService
     {
         private readonly IRepository<Review, Guid> _reviewRepo;
@@ -52,6 +29,7 @@ namespace TourismTracking.Experiences
         }
 
         // --- Reviews ---
+        [Authorize]
         public async Task<ReviewDto> AddReviewAsync(Guid destinationId, int rating, string comment)
         {
             var userId = _currentUser.Id ?? throw new UnauthorizedAccessException("Must be logged in.");
@@ -60,23 +38,28 @@ namespace TourismTracking.Experiences
             return ObjectMapper.Map<Review, ReviewDto>(review);
         }
 
+        [Authorize]
         public async Task<ReviewDto> EditReviewAsync(Guid reviewId, int rating, string comment)
         {
             var review = await _reviewRepo.GetAsync(reviewId);
-            if (review.UserId != _currentUser.Id) throw new UnauthorizedAccessException("Not your review.");
+            if (review.UserId != _currentUser.Id) 
+                throw new UnauthorizedAccessException("Not your review.");
 
             review.UpdateReview(rating, comment);
             await _reviewRepo.UpdateAsync(review);
             return ObjectMapper.Map<Review, ReviewDto>(review);
         }
 
+        [Authorize]
         public async Task DeleteReviewAsync(Guid reviewId)
         {
             var review = await _reviewRepo.GetAsync(reviewId);
-            if (review.UserId != _currentUser.Id) throw new UnauthorizedAccessException("Cannot delete someone else's review");
+            if (review.UserId != _currentUser.Id) 
+                throw new UnauthorizedAccessException("Cannot delete someone else's review");
             await _reviewRepo.DeleteAsync(reviewId);
         }
 
+        [AllowAnonymous]
         public async Task<DestinationMetricsDto> GetDestinationAverageRatingAsync(Guid destinationId)
         {
             var reviews = await _reviewRepo.GetListAsync(r => r.DestinationId == destinationId);
@@ -86,6 +69,7 @@ namespace TourismTracking.Experiences
             return new DestinationMetricsDto { AverageRating = Math.Round(avg, 1), TotalReviews = reviews.Count };
         }
 
+        [AllowAnonymous]
         public async Task<List<ReviewDto>> GetDestinationReviewsAsync(Guid destinationId)
         {
             var reviews = await _reviewRepo.GetListAsync(r => r.DestinationId == destinationId);
@@ -93,30 +77,36 @@ namespace TourismTracking.Experiences
         }
 
         // --- Experiences ---
+        [Authorize]
         public async Task<ExperienceDto> CreateExperienceAsync(Guid destinationId, string title, string content, string keywords)
         {
-            var userId = _currentUser.Id ?? throw new UnauthorizedAccessException();
+            var userId = _currentUser.Id ?? throw new UnauthorizedAccessException("Must be logged in.");
             var exp = new Experience(GuidGenerator.Create(), destinationId, userId, title, content, keywords);
             await _experienceRepo.InsertAsync(exp);
             return ObjectMapper.Map<Experience, ExperienceDto>(exp);
         }
 
+        [Authorize]
         public async Task<ExperienceDto> EditExperienceAsync(Guid experienceId, string title, string content, string keywords)
         {
             var exp = await _experienceRepo.GetAsync(experienceId);
-            if (exp.UserId != _currentUser.Id) throw new UnauthorizedAccessException();
+            if (exp.UserId != _currentUser.Id) 
+                throw new UnauthorizedAccessException("Not your experience.");
             exp.UpdateDetails(title, content, keywords);
             await _experienceRepo.UpdateAsync(exp);
             return ObjectMapper.Map<Experience, ExperienceDto>(exp);
         }
 
+        [Authorize]
         public async Task DeleteExperienceAsync(Guid experienceId)
         {
             var exp = await _experienceRepo.GetAsync(experienceId);
-            if (exp.UserId != _currentUser.Id) throw new UnauthorizedAccessException();
+            if (exp.UserId != _currentUser.Id) 
+                throw new UnauthorizedAccessException("Cannot delete someone else's experience.");
             await _experienceRepo.DeleteAsync(exp);
         }
 
+        [AllowAnonymous]
         public async Task<List<ExperienceDto>> GetExperiencesByDestinationAsync(Guid destinationId, string keywordFilter = null)
         {
             var query = await _experienceRepo.GetQueryableAsync();
@@ -129,6 +119,7 @@ namespace TourismTracking.Experiences
             return ObjectMapper.Map<List<Experience>, List<ExperienceDto>>(await AsyncExecuter.ToListAsync(filtered));
         }
 
+        [Authorize]
         public async Task<List<ExperienceDto>> GetMyExperiencesAsync()
         {
             var userId = _currentUser.Id ?? throw new UnauthorizedAccessException("Must be logged in.");
@@ -138,9 +129,10 @@ namespace TourismTracking.Experiences
         }
 
         // --- Favorites ---
+        [Authorize]
         public async Task AddToFavoritesAsync(Guid destinationId)
         {
-            var userId = _currentUser.Id ?? throw new UnauthorizedAccessException();
+            var userId = _currentUser.Id ?? throw new UnauthorizedAccessException("Must be logged in.");
             var exists = await _favoritesRepo.AnyAsync(f => f.DestinationId == destinationId && f.UserId == userId);
             if (!exists)
             {
@@ -148,9 +140,10 @@ namespace TourismTracking.Experiences
             }
         }
 
+        [Authorize]
         public async Task RemoveFromFavoritesAsync(Guid destinationId)
         {
-            var userId = _currentUser.Id ?? throw new UnauthorizedAccessException();
+            var userId = _currentUser.Id ?? throw new UnauthorizedAccessException("Must be logged in.");
             var fav = await _favoritesRepo.FirstOrDefaultAsync(f => f.DestinationId == destinationId && f.UserId == userId);
             if (fav != null)
             {
@@ -158,6 +151,7 @@ namespace TourismTracking.Experiences
             }
         }
 
+        [AllowAnonymous]
         public async Task<List<Guid>> GetMyFavoriteDestinationsAsync()
         {
             if (_currentUser.Id == null) return new List<Guid>();
@@ -166,8 +160,4 @@ namespace TourismTracking.Experiences
             return myFavs.Select(f => f.DestinationId).ToList();
         }
     }
-
-    public class ReviewDto { public Guid Id { get; set; } public int Rating { get; set; } public string Comment { get; set; } public Guid UserId { get; set; } }
-    public class DestinationMetricsDto { public double AverageRating { get; set; } public int TotalReviews { get; set; } }
-    public class ExperienceDto { public Guid Id { get; set; } public Guid DestinationId { get; set; } public Guid UserId { get; set; } public string Title { get; set; } public string Content { get; set; } public string Keywords { get; set; } }
 }

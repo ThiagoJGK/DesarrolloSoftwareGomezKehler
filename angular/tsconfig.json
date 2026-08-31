@@ -17,6 +17,9 @@
       "dom"
     ],
     "paths": {
+      "@angular/*": [
+        "node_modules/@angular/*"
+      ],
       "@proxy": [
         "src/app/proxy/index.ts"
       ],

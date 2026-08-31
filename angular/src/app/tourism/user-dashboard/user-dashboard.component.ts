@@ -12,6 +12,8 @@ import { AuthService, ConfigStateService } from '@abp/ng.core';
 import { NotificationService } from '../../proxy/notifications/notification.service';
 import { NotificationDto } from '../../proxy/notifications/models';
 import { AdminMetricsService } from '../../proxy/metrics/admin-metrics.service';
+import { ApiUsageSummaryDto, SystemStatisticsDto, ApiMetricDto } from '../../proxy/metrics/models';
+import { ToasterService, ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -30,10 +32,10 @@ export class UserDashboardComponent implements OnInit {
   notifications: NotificationDto[] = [];
   unreadNotificationsCount = 0;
 
-  // Métricas del Admin
-  apiUsageSummary: any[] = [];
-  systemStats: any = null;
-  recentApiCalls: any[] = [];
+  // Métricas del Admin fuertemente tipadas
+  apiUsageSummary: ApiUsageSummaryDto[] = [];
+  systemStats: SystemStatisticsDto | null = null;
+  recentApiCalls: ApiMetricDto[] = [];
   exportingMetrics = false;
   
   isAdmin = false;
@@ -58,7 +60,9 @@ export class UserDashboardComponent implements OnInit {
     private authService: AuthService,
     private configState: ConfigStateService,
     private notificationService: NotificationService,
-    private adminMetricsService: AdminMetricsService
+    private adminMetricsService: AdminMetricsService,
+    private toaster: ToasterService,
+    private confirmation: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -89,12 +93,14 @@ export class UserDashboardComponent implements OnInit {
   markAsRead(id: string) {
     this.notificationService.markAsRead(id).subscribe(() => {
       this.loadNotifications();
+      this.toaster.info('Notificación marcada como leída.');
     });
   }
 
   markAllAsRead() {
     this.notificationService.markAllAsRead().subscribe(() => {
       this.loadNotifications();
+      this.toaster.success('Todas las notificaciones han sido marcadas como leídas.');
     });
   }
 
@@ -106,17 +112,24 @@ export class UserDashboardComponent implements OnInit {
 
   exportReport() {
     this.exportingMetrics = true;
-    this.adminMetricsService.exportMetricsReport('CSV').subscribe(base64 => {
-      const csvContent = atob(base64);
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `reporte_metricas_${new Date().toISOString().substring(0,10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      this.exportingMetrics = false;
+    this.adminMetricsService.exportMetricsReport('CSV').subscribe({
+      next: (base64) => {
+        const csvContent = atob(base64);
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `reporte_metricas_${new Date().toISOString().substring(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        this.exportingMetrics = false;
+        this.toaster.success('Reporte CSV descargado con éxito.');
+      },
+      error: () => {
+        this.exportingMetrics = false;
+        this.toaster.error('Error al exportar el reporte de métricas.');
+      }
     });
   }
 
@@ -135,11 +148,11 @@ export class UserDashboardComponent implements OnInit {
     const file = event.target.files[0];
     if (file) {
       if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
-        alert('Solo se permiten archivos JPG o PNG.');
+        this.toaster.warn('Solo se permiten archivos JPG o PNG.');
         return;
       }
       if (file.size > 1024 * 1024) {
-        alert('La imagen de perfil supera el límite de 1 MB permitido por razones de rendimiento.');
+        this.toaster.warn('La imagen de perfil supera el límite de 1 MB permitido.');
         return;
       }
       const reader = new FileReader();
@@ -168,11 +181,11 @@ export class UserDashboardComponent implements OnInit {
       };
       this.profileService.update(input).subscribe({
         next: () => {
-          alert('Perfil actualizado con éxito.');
+          this.toaster.success('Perfil actualizado con éxito.');
           this.loadProfile();
         },
         error: (err) => {
-          alert('Error al actualizar el perfil.');
+          this.toaster.error('Error al actualizar el perfil.');
           console.error(err);
         }
       });
@@ -180,15 +193,21 @@ export class UserDashboardComponent implements OnInit {
   }
 
   deleteAccount() {
-    if (!confirm('¿Estás COMPLETAMENTE seguro de eliminar tu cuenta? Esta acción es irreversible.')) return;
-    this.tourismUserService.deleteMyAccount().subscribe({
-      next: () => {
-        alert('Cuenta eliminada con éxito.');
-        this.authService.logout().subscribe();
-      },
-      error: (err) => {
-        alert('Error al eliminar la cuenta.');
-        console.error(err);
+    this.confirmation.error(
+      '¿Estás COMPLETAMENTE seguro de eliminar tu cuenta? Esta acción es permanente e irreversible.',
+      'Eliminar Cuenta Permanentemente'
+    ).subscribe(status => {
+      if (status === Confirmation.Status.confirm) {
+        this.tourismUserService.deleteMyAccount().subscribe({
+          next: () => {
+            this.toaster.info('Cuenta eliminada.');
+            this.authService.logout().subscribe();
+          },
+          error: (err) => {
+            this.toaster.error('Error al eliminar la cuenta.');
+            console.error(err);
+          }
+        });
       }
     });
   }
@@ -209,8 +228,14 @@ export class UserDashboardComponent implements OnInit {
   }
 
   removeFromFavorites(id: string) {
-    this.interactionService.removeFromFavorites(id).subscribe(() => {
-      this.loadMyFavorites();
+    this.interactionService.removeFromFavorites(id).subscribe({
+      next: () => {
+        this.toaster.info('Destino removido de tus favoritos.');
+        this.loadMyFavorites();
+      },
+      error: () => {
+        this.toaster.error('Error al remover de favoritos.');
+      }
     });
   }
 
@@ -234,16 +259,31 @@ export class UserDashboardComponent implements OnInit {
       this.editExperienceData.title,
       this.editExperienceData.content,
       this.editExperienceData.keywords
-    ).subscribe(() => {
-      this.editingExperienceId = null;
-      this.loadMyExperiences();
+    ).subscribe({
+      next: () => {
+        this.editingExperienceId = null;
+        this.toaster.success('Diario de viaje actualizado con éxito.');
+        this.loadMyExperiences();
+      },
+      error: () => {
+        this.toaster.error('Error al actualizar el diario de viaje.');
+      }
     });
   }
 
   deleteExperience(experienceId: string) {
-    if (!confirm('¿Estás seguro de eliminar esta experiencia?')) return;
-    this.interactionService.deleteExperience(experienceId).subscribe(() => {
-      this.loadMyExperiences();
+    this.confirmation.warn('¿Estás seguro de que deseas eliminar este diario de viaje?', 'Confirmar Eliminación').subscribe(status => {
+      if (status === Confirmation.Status.confirm) {
+        this.interactionService.deleteExperience(experienceId).subscribe({
+          next: () => {
+            this.toaster.success('Diario de viaje eliminado.');
+            this.loadMyExperiences();
+          },
+          error: () => {
+            this.toaster.error('Error al eliminar la experiencia.');
+          }
+        });
+      }
     });
   }
 }

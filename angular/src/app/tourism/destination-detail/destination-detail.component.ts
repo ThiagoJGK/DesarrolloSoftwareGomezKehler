@@ -7,7 +7,9 @@ import { DestinationDto } from '../../proxy/destinations/models';
 import { TourismInteractionService } from '../../proxy/experiences/tourism-interaction.service';
 import { ReviewDto, ExperienceDto, DestinationMetricsDto } from '../../proxy/experiences/models';
 import { TourismUserService } from '../../proxy/users/tourism-user.service';
+import { PublicUserProfileDto } from '../../proxy/users/models';
 import { ConfigStateService } from '@abp/ng.core';
+import { ToasterService, ConfirmationService, Confirmation } from '@abp/ng.theme.shared';
 
 @Component({
   selector: 'app-destination-detail',
@@ -38,7 +40,7 @@ export class DestinationDetailComponent implements OnInit {
   editingReviewId: string | null = null;
   editReviewData = { rating: 5, comment: '' };
 
-  selectedUserProfile: any = null;
+  selectedUserProfile: PublicUserProfileDto | null = null;
   showProfileModal = false;
 
   constructor(
@@ -46,7 +48,9 @@ export class DestinationDetailComponent implements OnInit {
     private destinationService: DestinationService,
     private interactionService: TourismInteractionService,
     private tourismUserService: TourismUserService,
-    private configState: ConfigStateService
+    private configState: ConfigStateService,
+    private toaster: ToasterService,
+    private confirmation: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -110,25 +114,42 @@ export class DestinationDetailComponent implements OnInit {
         next: () => {
           this.isFavorite = false;
           this.togglingFavorite = false;
+          this.toaster.info('Destino removido de tus favoritos.');
         },
-        error: () => this.togglingFavorite = false
+        error: () => {
+          this.togglingFavorite = false;
+          this.toaster.error('Error al remover de favoritos.');
+        }
       });
     } else {
       this.interactionService.addToFavorites(this.destinationId).subscribe({
         next: () => {
           this.isFavorite = true;
           this.togglingFavorite = false;
+          this.toaster.success('Destino agregado a tus favoritos.');
         },
-        error: () => this.togglingFavorite = false
+        error: () => {
+          this.togglingFavorite = false;
+          this.toaster.error('Error al agregar a favoritos.');
+        }
       });
     }
   }
 
   submitActionReview() {
-    if (!this.newReview.comment) return;
-    this.interactionService.addReview(this.destinationId, this.newReview.rating, this.newReview.comment).subscribe(() => {
-      this.newReview.comment = '';
-      this.loadMetricsAndReviews();
+    if (!this.newReview.comment.trim()) {
+      this.toaster.warn('Por favor ingresa un comentario para tu reseña.');
+      return;
+    }
+    this.interactionService.addReview(this.destinationId, this.newReview.rating, this.newReview.comment.trim()).subscribe({
+      next: () => {
+        this.newReview.comment = '';
+        this.toaster.success('¡Reseña publicada con éxito!');
+        this.loadMetricsAndReviews();
+      },
+      error: () => {
+        this.toaster.error('No se pudo publicar la reseña.');
+      }
     });
   }
 
@@ -143,24 +164,53 @@ export class DestinationDetailComponent implements OnInit {
 
   saveEditReview() {
     if (!this.editingReviewId) return;
-    this.interactionService.editReview(this.editingReviewId, this.editReviewData.rating, this.editReviewData.comment).subscribe(() => {
-      this.editingReviewId = null;
-      this.loadMetricsAndReviews();
+    this.interactionService.editReview(this.editingReviewId, this.editReviewData.rating, this.editReviewData.comment.trim()).subscribe({
+      next: () => {
+        this.editingReviewId = null;
+        this.toaster.success('Reseña actualizada.');
+        this.loadMetricsAndReviews();
+      },
+      error: () => {
+        this.toaster.error('Error al actualizar la reseña.');
+      }
     });
   }
 
   deleteReview(reviewId: string) {
-    if (!confirm('¿Estás seguro de eliminar esta reseña?')) return;
-    this.interactionService.deleteReview(reviewId).subscribe(() => {
-      this.loadMetricsAndReviews();
+    this.confirmation.warn('¿Estás seguro de que deseas eliminar esta reseña?', 'Confirmar Eliminación').subscribe(status => {
+      if (status === Confirmation.Status.confirm) {
+        this.interactionService.deleteReview(reviewId).subscribe({
+          next: () => {
+            this.toaster.success('Reseña eliminada.');
+            this.loadMetricsAndReviews();
+          },
+          error: () => {
+            this.toaster.error('No se pudo eliminar la reseña.');
+          }
+        });
+      }
     });
   }
 
   submitActionExperience() {
-    if (!this.newExperience.title || !this.newExperience.content) return;
-    this.interactionService.createExperience(this.destinationId, this.newExperience.title, this.newExperience.content, this.newExperience.keywords).subscribe(() => {
-      this.newExperience = { title: '', content: '', keywords: '' };
-      this.loadExperiences();
+    if (!this.newExperience.title.trim() || !this.newExperience.content.trim()) {
+      this.toaster.warn('Completa el título y la historia de tu diario de viaje.');
+      return;
+    }
+    this.interactionService.createExperience(
+      this.destinationId,
+      this.newExperience.title.trim(),
+      this.newExperience.content.trim(),
+      this.newExperience.keywords.trim()
+    ).subscribe({
+      next: () => {
+        this.newExperience = { title: '', content: '', keywords: '' };
+        this.toaster.success('Diario de viaje publicado con éxito.');
+        this.loadExperiences();
+      },
+      error: () => {
+        this.toaster.error('Error al publicar el diario de viaje.');
+      }
     });
   }
 
@@ -172,7 +222,7 @@ export class DestinationDetailComponent implements OnInit {
         this.showProfileModal = true;
       },
       error: (err) => {
-        alert('No se pudo cargar el perfil del usuario.');
+        this.toaster.error('No se pudo cargar el perfil del usuario.');
         console.error(err);
       }
     });
