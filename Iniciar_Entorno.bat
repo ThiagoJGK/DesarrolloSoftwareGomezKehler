@@ -1,6 +1,9 @@
 @echo off
-title Iniciar Desarrollo - TourismTracking
+setlocal
+title TourismTracking - Modo Desarrollo Completo
 color 0A
+
+cd /d "%~dp0"
 
 echo ========================================================
 echo Iniciando Entorno de Desarrollo - TourismTracking
@@ -8,22 +11,25 @@ echo ========================================================
 echo.
 
 :: 1. Iniciar Backend (ASP.NET Core) en una nueva ventana
-echo [1/3] Iniciando Backend (.NET Core)...
-start "Backend - API" cmd /k "cd /d "%~dp0aspnet-core\src\TourismTracking.HttpApi.Host" && dotnet run"
-
-:: Esperar un par de segundos para asegurar que el backend levante
-timeout /t 5 /nobreak >nul
+echo [1/3] Levantando Backend (.NET Core)...
+start "Backend - API" /D "%~dp0aspnet-core\src\TourismTracking.HttpApi.Host" cmd /k "dotnet run"
 
 :: 2. Iniciar Frontend (Angular) en otra ventana
-echo [2/3] Iniciando Frontend (Angular)...
-start "Frontend - Angular" cmd /k "cd /d "%~dp0angular" && npm start"
+echo [2/3] Levantando Frontend (Angular ng serve)...
+start "Frontend - Angular" /D "%~dp0angular" cmd /k "npm start"
 
-:: 3. Abrir el navegador
-echo [3/3] Abriendo el navegador...
-timeout /t 10 /nobreak >nul
+:: 3. Esperar activamente a que los servicios esten listos
+echo.
+echo [3/3] Sincronizando servicios antes de abrir el navegador...
+python "%~dp0angular\wait_ready.py"
+
+:: 4. Abrir el navegador
 start http://localhost:4200
 
 echo.
-echo Todo listo! Puedes cerrar esta ventana.
-echo Para detener los servidores, cierra las ventanas negras (Backend y Frontend) que se abrieron.
+echo ========================================================
+echo  Todo listo! Puedes cerrar esta ventana.
+echo  Para detener los servidores, cierra las 2 ventanas negras.
+echo ========================================================
+echo.
 pause
