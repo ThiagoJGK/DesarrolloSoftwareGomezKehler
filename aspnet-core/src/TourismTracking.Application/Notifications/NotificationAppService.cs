@@ -64,19 +64,11 @@ namespace TourismTracking.Notifications
             }
         }
 
-        public async Task<NotificationDto> SendTestNotificationAsync(Guid? destinationId = null)
+        public async Task<NotificationDto> SendTestNotificationAsync()
         {
             var userId = CurrentUser.GetId();
-            string destName = "tu destino favorito";
-            if (destinationId.HasValue && _destinationRepository != null)
-            {
-                var dest = await _destinationRepository.FindAsync(destinationId.Value);
-                if (dest != null)
-                {
-                    destName = dest.Name;
-                }
-            }
-            else if (_destinationRepository != null)
+            string destName = "Bariloche";
+            if (_destinationRepository != null)
             {
                 var firstDest = await _destinationRepository.FirstOrDefaultAsync();
                 if (firstDest != null)
