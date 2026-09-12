@@ -56,3 +56,90 @@
   height: 20px;
   background-image: url('/assets/images/getting-started/x.svg');
 }
+
+/* ==========================================================================
+   Navegación Lateral en Escritorio: Expansión Fluida al Pasar el Cursor (:hover)
+   Exclusivo para viewport >= 1200px para preservar íntegramente la vista móvil (< 768px).
+   ========================================================================== */
+@media (min-width: 1200px) {
+  /* Estado base colapsado (72px) con transición cúbica fluida */
+  .lpx-sidebar-container {
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    overflow-x: hidden !important;
+    z-index: 1050;
+
+    .lpx-logo-container {
+      width: 72px !important;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .lpx-brand-logo {
+      background-image: var(--lpx-logo-icon) !important;
+      transition: background-image 0.2s ease !important;
+    }
+
+    .lpx-sidebar .lpx-nav {
+      width: 72px !important;
+      min-width: 72px !important;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .lpx-menu-item-text,
+    .group-menu-item,
+    .dd-icon,
+    .menu-collapse-icon {
+      opacity: 0;
+      white-space: nowrap;
+      transition: opacity 0.15s ease !important;
+      pointer-events: none;
+    }
+
+    /* Estado expandido en :hover */
+    &:hover {
+      width: 280px !important;
+      min-width: 280px !important;
+      max-width: 280px !important;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35) !important;
+
+      .lpx-logo-container {
+        width: 280px !important;
+      }
+
+      .lpx-brand-logo {
+        background-image: var(--lpx-logo) !important;
+      }
+
+      .lpx-sidebar .lpx-nav {
+        width: 280px !important;
+        min-width: 280px !important;
+      }
+
+      .lpx-menu-item-text,
+      .group-menu-item,
+      .dd-icon {
+        opacity: 1;
+        transition: opacity 0.25s ease 0.1s !important;
+        pointer-events: auto;
+      }
+    }
+  }
+
+  /* El contenedor de contenido principal conserva el margen base para evitar saltos de maquetación */
+  .lpx-content-container {
+    margin-left: 72px !important;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+}
+
+/* Transición suave para acordeón de filtros avanzados */
+.collapse {
+  transition: height 0.35s ease, opacity 0.25s ease;
+}
+

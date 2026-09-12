@@ -32,3 +32,11 @@ ABP_Tools/
 *.pdf
 *.txt
 extract_pdfs.py
+
+# Logs
+*.log
+temp.log
+
+# Agent Metadata & Scratch
+.agents/
+scratch/

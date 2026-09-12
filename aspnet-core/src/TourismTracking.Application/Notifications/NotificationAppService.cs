@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using TourismTracking.Destinations;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Users;
@@ -13,10 +14,14 @@ namespace TourismTracking.Notifications
     public class NotificationAppService : ApplicationService, INotificationAppService
     {
         private readonly IRepository<Notification, Guid> _notificationRepository;
+        private readonly IRepository<Destination, Guid>? _destinationRepository;
 
-        public NotificationAppService(IRepository<Notification, Guid> notificationRepository)
+        public NotificationAppService(
+            IRepository<Notification, Guid> notificationRepository,
+            IRepository<Destination, Guid>? destinationRepository = null)
         {
             _notificationRepository = notificationRepository;
+            _destinationRepository = destinationRepository;
         }
 
         public async Task<List<NotificationDto>> GetMyNotificationsAsync()
@@ -57,6 +62,37 @@ namespace TourismTracking.Notifications
                 notification.MarkAsRead();
                 await _notificationRepository.UpdateAsync(notification);
             }
+        }
+
+        public async Task<NotificationDto> SendTestNotificationAsync(Guid? destinationId = null)
+        {
+            var userId = CurrentUser.GetId();
+            string destName = "tu destino favorito";
+            if (destinationId.HasValue && _destinationRepository != null)
+            {
+                var dest = await _destinationRepository.FindAsync(destinationId.Value);
+                if (dest != null)
+                {
+                    destName = dest.Name;
+                }
+            }
+            else if (_destinationRepository != null)
+            {
+                var firstDest = await _destinationRepository.FirstOrDefaultAsync();
+                if (firstDest != null)
+                {
+                    destName = firstDest.Name;
+                }
+            }
+
+            var notification = new Notification(
+                GuidGenerator.Create(),
+                userId,
+                $"Aviso especial: {destName}",
+                $"Alerta en tiempo real: Se han actualizado las condiciones climáticas y la agenda de eventos para {destName}."
+            );
+            await _notificationRepository.InsertAsync(notification);
+            return ObjectMapper.Map<Notification, NotificationDto>(notification);
         }
     }
 }

@@ -10,5 +10,9 @@ namespace TourismTracking.Experiences
         public string Title { get; set; }
         public string Content { get; set; }
         public string Keywords { get; set; }
+
+        public string? AuthorName { get; set; }
+        public string? AuthorUsername { get; set; }
+        public string? AuthorAvatar { get; set; }
     }
 }

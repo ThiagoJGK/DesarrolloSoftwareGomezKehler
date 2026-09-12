@@ -23,8 +23,8 @@ function configureRoutes(routesService: RoutesService, injector: EnvironmentInje
         },
         {
           path: '/tourism',
-          name: 'Turismo (Destinos)',
-          iconClass: 'fas fa-plane',
+          name: 'Explorar Destinos',
+          iconClass: 'fas fa-compass',
           order: 2,
           layout: eLayoutType.application,
         },

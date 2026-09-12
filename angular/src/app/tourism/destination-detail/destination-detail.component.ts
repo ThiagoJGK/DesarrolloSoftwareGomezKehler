@@ -43,6 +43,9 @@ export class DestinationDetailComponent implements OnInit {
   selectedUserProfile: PublicUserProfileDto | null = null;
   showProfileModal = false;
 
+  authorProfiles: { [userId: string]: PublicUserProfileDto } = {};
+  readonly defaultFallbackImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=800';
+
   constructor(
     private route: ActivatedRoute,
     private destinationService: DestinationService,
@@ -66,6 +69,10 @@ export class DestinationDetailComponent implements OnInit {
     });
   }
 
+  onImgError(event: any) {
+    event.target.src = this.defaultFallbackImage;
+  }
+
   loadDestinationDetails() {
     this.destinationService.getSavedDestinations().subscribe(res => {
       this.destination = res.find(d => d.id === this.destinationId);
@@ -77,7 +84,62 @@ export class DestinationDetailComponent implements OnInit {
     this.interactionService.getDestinationReviews(this.destinationId).subscribe(r => {
       this.allReviews = r;
       this.applyReviewsFilter();
+      this.preloadAuthors(r.map(rev => rev.userId));
     });
+  }
+
+  preloadAuthors(userIds: (string | undefined)[]) {
+    const clean = Array.from(new Set(userIds.filter((id): id is string => !!id && !this.authorProfiles[id])));
+    clean.forEach(id => {
+      this.tourismUserService.getPublicProfile(id).subscribe({
+        next: (profile) => {
+          this.authorProfiles[id] = profile;
+        },
+        error: () => {}
+      });
+    });
+  }
+
+  getAuthorName(item: { userId?: string; authorName?: string; authorUsername?: string }): string {
+    if (item.authorName && item.authorName.trim()) {
+      return item.authorName.trim();
+    }
+    if (item.authorUsername && item.authorUsername.trim()) {
+      const u = item.authorUsername.trim();
+      return u.startsWith('@') ? u : '@' + u;
+    }
+    if (item.userId && this.authorProfiles[item.userId]) {
+      const p = this.authorProfiles[item.userId];
+      const full = `${p.name || ''} ${p.surname || ''}`.trim();
+      if (full) return full;
+      if (p.userName) return '@' + p.userName;
+    }
+    if (item.userId && this.currentUserId && item.userId === this.currentUserId) {
+      return 'Tú (Viajero)';
+    }
+    return 'Viajero Comunitario';
+  }
+
+  getAuthorUsername(item: { userId?: string; authorUsername?: string }): string {
+    if (item.authorUsername && item.authorUsername.trim()) {
+      const u = item.authorUsername.trim();
+      return u.startsWith('@') ? u : '@' + u;
+    }
+    if (item.userId && this.authorProfiles[item.userId]?.userName) {
+      return '@' + this.authorProfiles[item.userId].userName;
+    }
+    return '';
+  }
+
+  getAuthorAvatar(item: { userId?: string; authorAvatar?: string }): string {
+    if (item.authorAvatar && item.authorAvatar.trim()) {
+      return item.authorAvatar.trim();
+    }
+    if (item.userId && this.authorProfiles[item.userId]?.photo) {
+      return this.authorProfiles[item.userId].photo!;
+    }
+    const seed = item.userId || 'wanderer';
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
   }
 
   applyReviewsFilter() {
@@ -98,7 +160,10 @@ export class DestinationDetailComponent implements OnInit {
   }
 
   loadExperiences() {
-    this.interactionService.getExperiencesByDestination(this.destinationId, this.experienceKeywordFilter || undefined).subscribe(e => this.experiences = e);
+    this.interactionService.getExperiencesByDestination(this.destinationId, this.experienceKeywordFilter || undefined).subscribe(e => {
+      this.experiences = e;
+      this.preloadAuthors(e.map(exp => exp.userId));
+    });
   }
 
   checkIfFavorite() {
@@ -108,15 +173,22 @@ export class DestinationDetailComponent implements OnInit {
   }
 
   toggleFavorite() {
+    if (!this.currentUserId) {
+      this.toaster.info('Inicia sesión para agregar este destino a tus favoritos.');
+      return;
+    }
     this.togglingFavorite = true;
-    if (this.isFavorite) {
+    const wasFavorite = this.isFavorite;
+    this.isFavorite = !wasFavorite;
+
+    if (wasFavorite) {
       this.interactionService.removeFromFavorites(this.destinationId).subscribe({
         next: () => {
-          this.isFavorite = false;
           this.togglingFavorite = false;
           this.toaster.info('Destino removido de tus favoritos.');
         },
         error: () => {
+          this.isFavorite = wasFavorite;
           this.togglingFavorite = false;
           this.toaster.error('Error al remover de favoritos.');
         }
@@ -124,11 +196,11 @@ export class DestinationDetailComponent implements OnInit {
     } else {
       this.interactionService.addToFavorites(this.destinationId).subscribe({
         next: () => {
-          this.isFavorite = true;
           this.togglingFavorite = false;
           this.toaster.success('Destino agregado a tus favoritos.');
         },
         error: () => {
+          this.isFavorite = wasFavorite;
           this.togglingFavorite = false;
           this.toaster.error('Error al agregar a favoritos.');
         }
@@ -192,16 +264,31 @@ export class DestinationDetailComponent implements OnInit {
     });
   }
 
+  addKeywordTag(tag: string) {
+    if (!this.newExperience.keywords || !this.newExperience.keywords.trim()) {
+      this.newExperience.keywords = tag;
+    } else {
+      const existing = this.newExperience.keywords.split(',').map(k => k.trim());
+      if (!existing.includes(tag)) {
+        this.newExperience.keywords = `${this.newExperience.keywords.trim()}, ${tag}`;
+      }
+    }
+  }
+
   submitActionExperience() {
     if (!this.newExperience.title.trim() || !this.newExperience.content.trim()) {
       this.toaster.warn('Completa el título y la historia de tu diario de viaje.');
       return;
     }
+    const finalKeywords = (this.newExperience.keywords && this.newExperience.keywords.trim())
+      ? this.newExperience.keywords.trim()
+      : 'viajes, turismo';
+
     this.interactionService.createExperience(
       this.destinationId,
       this.newExperience.title.trim(),
       this.newExperience.content.trim(),
-      this.newExperience.keywords.trim()
+      finalKeywords
     ).subscribe({
       next: () => {
         this.newExperience = { title: '', content: '', keywords: '' };
@@ -214,7 +301,7 @@ export class DestinationDetailComponent implements OnInit {
     });
   }
 
-  viewPublicProfile(userId: string) {
+  openPublicProfile(userId?: string) {
     if (!userId) return;
     this.tourismUserService.getPublicProfile(userId).subscribe({
       next: (profile) => {
@@ -226,6 +313,10 @@ export class DestinationDetailComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  viewPublicProfile(userId?: string) {
+    this.openPublicProfile(userId);
   }
 
   closeProfileModal() {

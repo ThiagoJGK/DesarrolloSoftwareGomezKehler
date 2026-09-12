@@ -1,49 +1,51 @@
-# 📚 Centro de Documentación: TourismTracking
+# 📚 Centro de Documentación: TourismTracking / WanderTrack
 
-¡Bienvenido al núcleo de conocimiento del proyecto **TourismTracking**! Este directorio centraliza toda la información técnica, académica y organizativa necesaria para la defensa del Trabajo Práctico Final de la materia **Desarrollo de Software (UTN-FRCU, Año 2025)**.
+¡Bienvenido al repositorio documental del proyecto **TourismTracking (WanderTrack)**! Este directorio centraliza toda la información técnica, de arquitectura y de seguimiento requerida para la defensa del Trabajo Práctico Final de la materia **Desarrollo de Software (UTN-FRCU, Ciclo Lectivo 2025 - Cátedra Prof. Enzo Tanga)**.
 
-Este espacio está estructurado con formato enriquecido (Markdown) y optimizado para que tú, tu colaborador Exequiel y las inteligencias artificiales de asistencia (**Antigravity**) puedan navegar e interpretar el contexto de desarrollo con absoluta precisión.
+Este espacio está organizado en Markdown para facilitar la lectura, el control de versiones y el trabajo colaborativo entre **Thiago JGK y Exequiel**.
 
 ---
 
 ## 🗺️ Mapa de Documentación
 
-Haz clic en cualquiera de los enlaces para acceder de forma directa a los documentos específicos:
+A continuación se indexan los documentos técnicos y normativos del proyecto:
 
 ### 🎓 Aspectos Académicos y Requerimientos
-*   **[Condiciones de Aprobación 2025](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/Condiciones_Aprobacion_2025.md):** El subconjunto exacto de operaciones de Backend y Frontend requeridas para la promoción de la materia.
-*   **[Pliego de Requerimientos TP Final v0.1](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/TP_Final_v0.1.md):** Especificación completa de objetivos, flujos del sistema y tablas detalladas de Requerimientos Funcionales (RF) y No Funcionales (RNF).
-*   **[Matriz de Operaciones del Sistema v1.0](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/Operaciones_Sistema_v1.0.md):** Checklist de control detallado de todas las operaciones del sistema de cara al seguimiento del avance de implementación.
+* **[Condiciones de Aprobación 2025](./Condiciones_Aprobacion_2025.md):** El subconjunto exacto de operaciones de Backend y Frontend requeridas para la promoción de la materia.
+* **[Pliego de Requerimientos TP Final v0.1](./TP_Final_v0.1.md):** Especificación completa de objetivos, flujos del sistema y tablas detalladas de Requerimientos Funcionales (RF) y No Funcionales (RNF).
+* **[Matriz de Operaciones del Sistema v1.0](./Operaciones_Sistema_v1.0.md):** Matriz de trazabilidad y control de avance de todas las operaciones del sistema.
 
-### 👥 Onboarding y Colaboración
-*   **[Guía de Colaboración Git & IA](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/Guia_Colaboracion_Git_AI.md):** Protocolo de integración continua en local (`dev` branch, rebases y validaciones obligatorias) y protección en producción (`prod` branch, Pull Requests automáticos por IA).
-*   **[Hoja de Ruta de Desarrollo (Exequiel)](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/Hoja_Ruta_Desarrollo_Exequiel.md):** Lista de tareas de remediación de Frontend, Backend y Tests con prompts específicos de Antigravity listos para ser ejecutados.
-*   **[Guía Maestra de Onboarding (Exequiel)](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/Guia_Onboarding_Exequiel.md):** Manual maestro de integración para configurar y levantar el entorno local de desarrollo de forma automatizada.
+### 👥 Onboarding y Colaboración Técnica
+* **[Guía de Colaboración Git y Flujo de Trabajo](./Guia_Colaboracion_Git.md):** Protocolo de integración continua en local (`dev` branch, rebases y validaciones obligatorias) y protección en producción (`prod` branch, revisiones cruzadas y Pull Requests de entrega).
+* **[Hoja de Ruta de Desarrollo](./Hoja_Ruta_Desarrollo_Exequiel.md):** Matriz de tareas de implementación de Frontend, Backend, persistencia y suite de pruebas con especificaciones técnicas y criterios de aceptación.
+* **[Guía Maestra de Onboarding](./Guia_Onboarding_Exequiel.md):** Manual de instalación de dependencias (.NET 8 SDK, Node.js, SQL Server, DbMigrator) y puesta en marcha del entorno local.
+* **[Manual Maestro de Desarrollo (HTML)](./Manual_Maestro_Exequiel.html):** Manual interactivo en formato editorial A4 con arquitectura DDD, flujo Git y Spec-Driven Development.
 
 ### 📐 Arquitectura, UML e Informes Técnicos
-*   **[Justificación Arquitectónica y Data Flow](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/Justificacion_Arquitectonica.md):** Reporte exhaustivo que detalla la fundamentación de DDD/ABP, dependencias modulares y diagramas de secuencia de flujo de datos extremo a extremo.
-*   **[Diagramas UML & Mermaid](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/diagramas_uml.md):** Modelos visuales que describen el Dominio (Clases), los Casos de Uso, la secuencia de Búsqueda y el comportamiento del Worker periódico de notificaciones.
-*   **[Reporte de Auditoría de Brechas y Calidad](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/Reporte_Auditoria_Brechas.md):** Diagnóstico profundo consolidado que detalla las brechas lógicas en Frontend, Backend y Cobertura de Pruebas frente a las condiciones académicas.
-*   **[Informe de Cumplimiento Técnico (Anterior)](file:///c:/Users/thiag/Desktop/Files/Facu/FACU%202024/Desarrollo%20de%20Software/Proyecto%20Final/Documentacion/analysis_results.md):** Análisis preliminar que detalla cómo la arquitectura DDD sobre ABP resuelve el 100% de las exigencias teóricas a nivel de servidor.
+* **[Justificación Arquitectónica y Data Flow](./Justificacion_Arquitectonica.md):** Fundamentación del diseño DDD sobre ABP Framework v8.3.4, desacoplamiento modular y diagramas de flujo de datos extremo a extremo.
+* **[Diagramas UML & Mermaid](./diagramas_uml.md):** Modelos visuales que describen el Dominio (Diagrama de Clases), Casos de Uso, secuencia de Búsqueda y comportamiento del Worker periódico de notificaciones.
+* **[Reporte de Auditoría de Brechas y Calidad](./Reporte_Auditoria_Brechas.md):** Diagnóstico técnico consolidado que detalla las brechas resueltas en Frontend, Backend y Cobertura de Pruebas frente a las condiciones de la cátedra.
+* **[Informe de Cumplimiento Técnico](./analysis_results.md):** Análisis de cobertura funcional que detalla cómo la arquitectura DDD sobre ABP resuelve las exigencias de la cátedra.
 
 ---
 
 ## 🏢 Arquitectura del Proyecto (DDD Layers)
 
-La solución está construida siguiendo los lineamientos de Clean Architecture bajo la metodología DDD (Domain-Driven Design), estructurada en los siguientes directorios clave dentro de `aspnet-core/src/`:
+La solución está construida siguiendo los lineamientos de Clean Architecture bajo la metodología DDD (Domain-Driven Design), estructurada en los siguientes proyectos dentro de `aspnet-core/src/`:
 
 ```
 TourismTracking/
-├── TourismTracking.Domain/             <- Reglas de negocio y entidades puras (Aggregate Roots, Entities).
-├── TourismTracking.Domain.Shared/      <- Enums, constantes y clases compartidas por múltiples capas.
-├── TourismTracking.Application.Contracts/ <- Interfaces de servicio (AppServices) y DTOs de comunicación.
-├── TourismTracking.Application/         <- Lógica e implementación de servicios de aplicación y Workers.
-├── TourismTracking.EntityFrameworkCore/<- Infraestructura ORM, DbContext y repositorios concretos.
-└── TourismTracking.HttpApi.Host/       <- Servidor Web API principal y punto de arranque del Backend.
+├── TourismTracking.Domain/             <- Reglas de negocio puras, entidades raíz (Destination, Experience) y semillas (IDataSeedContributor).
+├── TourismTracking.Domain.Shared/      <- Enums, constantes, tipos compartidos y localización.
+├── TourismTracking.Application.Contracts/ <- Interfaces de servicio (AppServices), permisos y DTOs fuertemente tipados.
+├── TourismTracking.Application/         <- Casos de uso, servicios de aplicación, mapeos con AutoMapper y Workers de fondo.
+├── TourismTracking.EntityFrameworkCore/<- Infraestructura ORM, DbContext relacional, mapeo Fluent API y migraciones.
+└── TourismTracking.HttpApi.Host/       <- Servidor Web API REST, autenticación OpenIddict y endpoints para Angular.
 ```
 
 ---
 
-## 🛠️ Buenas Prácticas del Centro de Documentación
-1.  **Sincronización:** Cada cambio realizado en la lógica de negocio o en la estructura del código que impacte un requerimiento académico debe verse reflejado en la **Matriz de Operaciones del Sistema** marcando el checkbox correspondiente `[x]`.
-2.  **Uso de IA:** Cuando des instrucciones a tu asistente de IA (**Antigravity**), indícale que lea este `README.md` como punto de partida para que sepa exactamente dónde encontrar los requerimientos, diagramas y guías de colaboración.
+## 🛠️ Buenas Prácticas y Mantenimiento Documental
+1. **Sincronización:** Cada cambio realizado en la lógica de negocio o en la estructura del código que impacte un requerimiento académico debe verse reflejado en la **Matriz de Operaciones del Sistema** marcando el checkbox correspondiente `[x]`.
+2. **Trazabilidad de Commits:** Utilizar mensajes bajo el estándar Conventional Commits referenciando la sección o funcionalidad impactada.
+3. **Validación Cruzada:** Antes de fusionar a la rama `prod`, validar que la documentación se encuentre alineada con el comportamiento real del sistema verificado mediante la suite de pruebas unitarias.

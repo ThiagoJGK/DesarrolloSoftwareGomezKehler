@@ -52,6 +52,9 @@ export class UserDashboardComponent implements OnInit {
   profilePreferences = '';
   photoBase64 = '';
 
+  currentUser: any = null;
+  simulatingNotification = false;
+
   constructor(
     private interactionService: TourismInteractionService,
     private destinationService: DestinationService,
@@ -66,8 +69,8 @@ export class UserDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const currentUser = this.configState.getOne('currentUser');
-    this.isAdmin = currentUser?.roles?.includes('admin') || false;
+    this.currentUser = this.configState.getOne('currentUser');
+    this.isAdmin = this.currentUser?.roles?.includes('admin') || false;
 
     this.loadMyExperiences();
     this.loadMyFavorites();
@@ -101,6 +104,23 @@ export class UserDashboardComponent implements OnInit {
     this.notificationService.markAllAsRead().subscribe(() => {
       this.loadNotifications();
       this.toaster.success('Todas las notificaciones han sido marcadas como leídas.');
+    });
+  }
+
+  triggerTestNotification() {
+    this.simulatingNotification = true;
+    const destinationId = this.favoriteDestinations.length > 0 ? this.favoriteDestinations[0].id : undefined;
+    this.notificationService.sendTestNotification(destinationId).subscribe({
+      next: () => {
+        this.simulatingNotification = false;
+        this.toaster.success('¡Alerta de prueba en vivo generada exitosamente!');
+        this.loadNotifications();
+      },
+      error: (err) => {
+        this.simulatingNotification = false;
+        this.toaster.error('No se pudo generar la alerta de prueba.');
+        console.error(err);
+      }
     });
   }
 

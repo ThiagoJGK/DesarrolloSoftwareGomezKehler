@@ -1,88 +1,106 @@
 # 🌍 Guía Maestra de Onboarding: Proyecto TourismTracking
-**Bienvenido, Exequiel.** 
 
-Este documento es una guía exhaustiva diseñada para alguien que se incorpora desde cero. Aquí desglosamos la arquitectura, las funcionalidades y los pasos técnicos para que puedas operar el sistema hoy mismo de la mano de **Antigravity**.
+**Bienvenido, Exequiel.**  
+**Proyecto:** TourismTracking / WanderTrack  
+**Cátedra:** Desarrollo de Software 2025 - UTN FRCU | Prof. Enzo Tanga  
+**Colaboradores:** Thiago JGK & Exequiel  
 
----
-
-## 1. ¿Qué es TourismTracking? (Contexto)
-TourismTracking es una plataforma web profesional que centraliza la búsqueda de destinos turísticos, permite el seguimiento de ciudades de interés y fomenta una comunidad de viajeros mediante reseñas y experiencias compartidas.
-
-### Explicación de los "Hitos" (Milestones)
-El proyecto se dividió en fases lógicas para asegurar una arquitectura robusta:
-*   **Hito 1: Cimientos y Arquitectura**: Configuración de **ABP.IO**, un framework basado en **Domain-Driven Design (DDD)**. Se definió la estructura de capas (Dominio, Aplicación, Infraestructura y Web).
-*   **Hito 2: Identidad y Seguridad**: Implementación de la gestión de usuarios, roles (Admin/Usuario) y autenticación segura mediante JWT.
-*   **Hito 3: Integración Geográfica**: Conexión con la API externa **GeoDB Cities**. Permite buscar ciudades reales en todo el mundo y persistir sus datos técnicos en nuestra base local.
-*   **Hito 4: Interacción Social**: Creación de los sistemas de **Experiencias** (blogs de viajes), **Reviews** (calificaciones 1-5 estrellas) y **Favoritos**.
-*   **Hito 5: Inteligencia y Notificaciones**: Desarrollo de un **Worker (Job de fondo)** que se ejecuta cada 24 horas para revisar cambios en destinos favoritos y preparar notificaciones.
+Este documento es una guía exhaustiva diseñada para la incorporación al entorno de desarrollo local. Aquí se detallan la arquitectura del sistema, los prerrequisitos técnicos, la configuración paso a paso de la base de datos y los comandos para poner en marcha la solución completa.
 
 ---
 
-## 2. Configuración del Entorno con Antigravity
+## 1. ¿Qué es TourismTracking? (Contexto del Sistema)
 
-Como ya tienes **Antigravity** instalado, no necesitas realizar las instalaciones manualmente. Simplemente copia y pega el siguiente prompt en tu chat de Antigravity para que él se encargue de preparar todo por ti.
+TourismTracking (WanderTrack) es una plataforma web profesional desarrollada sobre arquitectura **Domain-Driven Design (DDD)** con **ABP Framework v8.3.4** en el backend (.NET 8) y **Angular 18** en el frontend (Lepton-X Lite UI). Centraliza la búsqueda de destinos turísticos, la gestión de itinerarios y una comunidad de viajeros mediante reseñas con estrellas y experiencias compartidas.
 
-### 🚀 Prompt de Configuración Automática
-> [!TIP]
-> **Copia el texto de abajo y pégalo en Antigravity:**
->
-> "Hola Antigravity, soy Exequiel y me estoy incorporando al proyecto TourismTracking. Por favor, ayúdame a configurar mi entorno de desarrollo desde cero en esta máquina. Realiza las siguientes tareas:
-> 1. **Recuperar Proyecto**: Clona el repositorio `https://github.com/ThiagoJGK/DesarrolloSoftwareGomezKehler.git` en una carpeta de mi elección.
-> 2. **Verificar Dependencias**: Revisa si tengo instalados .NET 8 SDK, Node.js (LTS) y SQL Server. Si falta algo, indícame el link de descarga o ayúdame a instalarlo.
-> 3. **Instalar ABP CLI**: Ejecuta el comando `dotnet tool install -g Volo.Abp.Cli` para instalar la herramienta global de ABP.
-> 4. **Base de Datos**: Ejecuta el proyecto `TourismTracking.DbMigrator` dentro de `aspnet-core/src` para crear la base de datos local y cargar los datos iniciales.
-> 5. **Frontend**: Entra a la carpeta `angular`, ejecuta `npm install` para las dependencias y luego prepárame el comando para iniciar el sistema."
+### Estructura de Módulos y Arquitectura
+* **Capa de Dominio (`TourismTracking.Domain`)**: Entidades raíz (`Destination`, `Experience`), entidades secundarias (`Review`, `Notification`), reglas de negocio e inicialización de datos vía `IDataSeedContributor`.
+* **Capa de Contratos (`TourismTracking.Application.Contracts`)**: DTOs fuertemente tipados, interfaces de servicios y permisos de seguridad.
+* **Capa de Aplicación (`TourismTracking.Application`)**: Lógica de aplicación, casos de uso, servicios de destinos, reseñas y tablero de usuario.
+* **Capa de Infraestructura (`TourismTracking.EntityFrameworkCore`)**: Mapeo relacional con EF Core, configuración de Fluent API y migraciones de esquema en SQL Server.
+* **Capa Web API (`TourismTracking.HttpApi.Host`)**: Endpoints REST, autenticación OpenIddict y documentación Swagger interactiva.
+* **Capa de Presentación (`angular/`)**: SPA en Angular 18, temas responsivos, componentes de destinos, reseñas y dashboard de usuario.
 
 ---
 
-## 3. Catálogo Exhaustivo de Funcionalidades
-Actualmente, el sistema cuenta con las siguientes capacidades operativas:
+## 2. Configuración Manual del Entorno de Desarrollo (Paso a Paso)
 
-### 👤 Gestión de Identidad
-*   **Seguridad**: Encriptación de contraseñas y manejo de sesiones.
-*   **Perfiles**: Cada usuario puede editar su bio y preferencias de notificación.
-*   **Roles**: Los Administradores pueden gestionar a otros usuarios.
+Para poner en marcha la aplicación de forma local, sigue la siguiente secuencia de instalación y configuración:
 
-### 🗺️ Exploración de Destinos
-*   **Búsqueda Global**: Filtra por nombre, país o población mínima consumiendo datos de GeoDB.
-*   **Caché Inteligente**: Cuando un usuario interactúa con una ciudad, esta se guarda en nuestra DB para acceso rápido.
+### Paso 1: Prerrequisitos de Software
+Asegúrate de contar con las siguientes herramientas instaladas en tu sistema Windows:
+1. **.NET 8 SDK**: Versión 8.0.x o superior (`dotnet --version`).
+2. **Node.js**: Versión 18 o 20 LTS (`node --version`) con npm (`npm --version`).
+3. **SQL Server**: Instancia local (SQL Server Developer, Express o LocalDB `(localdb)\mssqllocaldb`).
+4. **ABP CLI**: Herramienta global de desarrollo de ABP Framework. Instalar mediante:
+   ```powershell
+   dotnet tool install -g Volo.Abp.Cli
+   ```
 
-### ✍️ Comunidad de Viajeros
-*   **Experiencias**: Un muro donde los usuarios redactan relatos de sus viajes con etiquetas.
-*   **Reseñas y Rating**: Sistema de 1 a 5 estrellas. El sistema calcula automáticamente el promedio de satisfacción de cada destino.
-*   **Favoritos**: Botón de "Seguir" para añadir destinos a una lista personal.
+### Paso 2: Clonado y Sincronización de Git
+Clonar el repositorio y ubicarse en la rama activa de desarrollo:
+```powershell
+git clone https://github.com/ThiagoJGK/DesarrolloSoftwareGomezKehler.git
+cd "Proyecto Final"
+git checkout dev
+git pull --rebase origin dev
+```
+
+### Paso 3: Configuración de Base de Datos y Sembrado Inicial (DbMigrator)
+El proyecto cuenta con un migrador automático que crea la base de datos relacional, aplica las migraciones de Entity Framework Core e inserta los datos semilla institucionales:
+```powershell
+dotnet run --project aspnet-core/src/TourismTracking.DbMigrator/TourismTracking.DbMigrator.csproj
+```
+*Resultado esperado:* Salida por consola indicando ejecución exitosa de migraciones y mensaje `Successfully completed database migrations.`.
+
+### Paso 4: Instalación de Dependencias del Frontend
+Ingresar a la carpeta de Angular e instalar las librerías requeridas:
+```powershell
+cd angular
+npm install
+```
+
+---
+
+## 3. Puesta en Marcha del Entorno Local
+
+Puedes iniciar los servicios mediante los scripts automatizados de la raíz o mediante consolas independientes:
+
+### Opción A: Inicio con Scripts Automatizados
+En la raíz del repositorio se dispone de ejecutables batch preparados para levantar todos los módulos:
+* `Iniciar_Entorno.bat`: Inicia SQL Server (si aplica), ejecuta el Web API y levanta el servidor de desarrollo de Angular.
+* `Iniciar_Entorno_Ligero.bat`: Variante optimizada para equipos con recursos acotados.
+
+### Opción B: Inicio Manual por Terminales
+1. **Backend Web API (.NET 8)**:
+   ```powershell
+   cd aspnet-core/src/TourismTracking.HttpApi.Host
+   dotnet run
+   ```
+   *Acceso Swagger:* `https://localhost:44305/swagger`
+2. **Frontend Angular 18**:
+   ```powershell
+   cd angular
+   npm start
+   ```
+   *Acceso Interfaz:* `http://localhost:4200`
 
 ---
 
-## 4. Cómo Ejecutar el Sistema (Una vez configurado)
+## 4. Credenciales de Acceso Demo y Verificación
 
-Una vez que Antigravity termine la configuración, estos son tus comandos diarios:
+Para ingresar al sistema y validar la operatividad de los módulos:
 
-1.  **Backend**: 
-    ```bash
-    cd aspnet-core/src/TourismTracking.HttpApi.Host
-    dotnet run
-    ```
-2.  **Frontend**: 
-    ```bash
-    cd angular
-    npm start
-    ```
-    *Abre tu navegador en `http://localhost:4200`.*
+* **Usuario Administrador:** `admin`
+* **Contraseña:** `1q2w3E*`
+
+### Recorrido de Verificación Rápida:
+1. **Inicio de Sesión:** Acceder a `http://localhost:4200` e iniciar sesión con las credenciales demo.
+2. **Catálogo de Destinos:** Explorar los destinos sembrados con imágenes de alta resolución y calificaciones reales.
+3. **Filtros Avanzados:** Probar el acordeón de filtros por país, región y población.
+4. **Mi Tablero:** Acceder a "Mi Tablero" para interactuar con las crónicas de viaje persistidas, destinos favoritos y notificaciones del usuario.
+5. **Ejecución de Pruebas Unitarias:** Ejecutar `dotnet test aspnet-core/TourismTracking.sln` para comprobar que la totalidad de los 55 tests unitarios pasan exitosamente.
 
 ---
 
-## 5. Guía de Pruebas (Verification Flow)
-Para confirmar que todo funciona, realiza este recorrido:
-
-1.  **Login**: Usa el usuario `admin` y la contraseña `1q2w3E*`.
-2.  **Buscar**: Ve al buscador, escribe "Paris" y presiona Enter.
-3.  **Seguir**: Entra al detalle y presiona el corazón de favoritos.
-4.  **Reseñar**: Deja una calificación de 5 estrellas.
-5.  **Verificar**: Comprueba que el destino aparece ahora en tu dashboard personal.
-
----
-> [!IMPORTANT]
-> **Tu Próximo Desafío**: Tu prioridad será ayudarnos a migrar el sistema de notificaciones de un estado "simulado" a un envío de correos electrónicos real (SMTP).
-
-**¡Bienvenido al equipo, Exequiel!**
+**¡Bienvenido al equipo de desarrollo, Exequiel!**

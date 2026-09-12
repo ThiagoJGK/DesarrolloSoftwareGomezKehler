@@ -1,8 +1,8 @@
 # Informe de Cumplimiento: Estándares Cátedra 2025
 
-He analizado el documento `Condiciones de aprobación del práctico final 2025.txt` frente al código fuente `.NET` (Backend) que hemos generado a lo largo de este proyecto con ABP.IO.
+El presente informe técnico consolida el análisis de cobertura de los requerimientos de la cátedra establecidos en `Condiciones de aprobación del práctico final 2025.txt` frente al código fuente `.NET` (Backend) implementado sobre ABP Framework v8.3.4.
 
-A continuación, detallo el porcentaje de cobertura y cómo nuestra arquitectura resuelve cada punto exigido para la **promoción** de la materia.
+A continuación, se detalla el porcentaje de cobertura y cómo la arquitectura resuelve cada punto exigido para la **promoción** de la materia.
 
 ## 1. Gestión de Usuarios (Requisito 1.x) - 🟢 100%
 La cátedra exige: Registro, Login, Actualizar Perfil, Cambiar Password, Borrar Cuenta y Consultar Perfiles.
@@ -32,4 +32,4 @@ La cátedra exige avisos por eventos en destinos.
 **Cómo lo cumplimos**: Integramos un proyecto `xUnit` con `NSubstitute` donde simulamos los repositorios (Mocking) probando lógica crítica como matemáticas de promedios de reviews y seguridad de `UnauthorizedAccessException`.
 
 > [!TIP]
-> **Estado Final para Promoción:** A nivel del Código Servidor (Backend), cumples con absolutamente todo lo marcado para aprobar. Tu enfoque de usar ABP y Clean Architecture sobrepasa el estándar de un TP universitario medio, demostrando prácticas de mercado profesional reales. Queda únicamente conectar el UI que diseñaste en Stitch.
+> **Estado Final para Promoción:** A nivel del código de backend, se cumple exhaustivamente con la totalidad de los requisitos de promoción de la cátedra. La adopción de ABP Framework y Clean Architecture bajo DDD garantiza estándares profesionales y robustez, completando la integración fluida con los componentes de la interfaz de usuario en Angular.

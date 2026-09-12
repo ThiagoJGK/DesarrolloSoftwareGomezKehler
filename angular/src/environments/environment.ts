@@ -6,8 +6,8 @@ export const environment = {
   production: false,
   application: {
     baseUrl,
-    name: 'TourismTracking',
-    logoUrl: '',
+    name: 'WanderTrack',
+    logoUrl: 'assets/images/logo/logo-light.svg',
   },
   oAuthConfig: {
     issuer: 'https://localhost:44305/',

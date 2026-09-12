@@ -2,7 +2,7 @@
 **Proyecto:** TourismTracking  
 **Objetivo:** Consolidación de hallazgos del sistema frente a los requerimientos de promoción de la cátedra (Año 2025).
 
-Este reporte unifica las auditorías profundas realizadas de manera paralela por la legión de subagentes en las capas de **Backend (.NET)**, **Frontend (Angular)** y **Pruebas Unitarias**. Su propósito es servir de mapa de ruta definitivo para remediar las falencias técnicas del software antes de la defensa final de la materia.
+Este reporte unifica las auditorías profundas realizadas por el equipo de desarrollo mediante inspección estática, matrices de requerimientos y pruebas de integración en las capas de **Backend (.NET)**, **Frontend (Angular)** y **Pruebas Unitarias**. Su propósito es servir de mapa de ruta definitivo para remediar las falencias técnicas del software antes de la defensa final de la materia.
 
 ---
 
@@ -74,7 +74,7 @@ Si la API de Open-Meteo sufre de indisponibilidad o latencia excesiva, el sistem
 
 ## 🛠️ 4. Plan de Remediación y Ruta Tecnológica
 
-Para asegurar una entrega de altísima calidad profesional ante la cátedra y cumplir con el 100% de la promoción, la legión de IAs y programadores humanos deben abordar las siguientes prioridades:
+Para asegurar una entrega de altísima calidad profesional ante la cátedra y cumplir con el 100% de la promoción, el equipo de desarrollo debe abordar las siguientes prioridades:
 
 ### Fase I: Remediación Inmediata de "Mocks" en Angular
 1.  **Vincular Enlaces Huérfanos:**

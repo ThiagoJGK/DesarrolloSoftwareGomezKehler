@@ -1,5 +1,42 @@
 <div class="container mt-5">
   
+  <!-- Header de Mi Tablero -->
+  <div class="card border-0 shadow-sm mb-4 text-white rounded-3" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-info bg-opacity-25 text-white px-3 py-2 fs-6 border border-info border-opacity-25">
+              <i class="fas fa-compass me-1"></i> Comunidad WanderTrack
+            </span>
+            <span class="badge bg-secondary px-2 py-1">
+              {{ currentUser?.userName ? '@' + currentUser.userName : (profileUsername ? '@' + profileUsername : 'Mi Tablero') }}
+            </span>
+          </div>
+          <h4 class="fw-bold mb-1">Mi Tablero Personal</h4>
+          <p class="text-light opacity-75 mb-0 small">
+            Gestiona tus destinos favoritos, bitácoras de viaje y notificaciones en tiempo real.
+          </p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-outline-light btn-sm px-3" (click)="setTab('experiences')" [class.active]="activeTab === 'experiences'">
+            <i class="fas fa-book-open me-1"></i> Experiencias ({{ myExperiences.length }})
+          </button>
+          <button class="btn btn-outline-light btn-sm px-3" (click)="setTab('favorites')" [class.active]="activeTab === 'favorites'">
+            <i class="fas fa-heart me-1 text-danger"></i> Favoritos ({{ favoriteDestinations.length }})
+          </button>
+          <button class="btn btn-outline-light btn-sm px-3" (click)="setTab('notifications')" [class.active]="activeTab === 'notifications'">
+            <i class="fas fa-bell me-1 text-warning"></i> Notificaciones ({{ notifications.length }})
+            <span class="badge bg-danger rounded-pill ms-1" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
+          </button>
+          <button *ngIf="isAdmin" class="btn btn-warning btn-sm px-3 text-dark fw-semibold" (click)="setTab('admin')" [class.active]="activeTab === 'admin'">
+            <i class="fas fa-chart-line me-1"></i> Métricas API
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Perfil de Usuario y Cabecera -->
   <div class="card shadow-sm border-0 mb-5 bg-white overflow-hidden">
     <div class="row g-0">
@@ -29,7 +66,7 @@
             <h3 class="fw-bold mb-1 text-dark">{{ profileName }} {{ profileSurname }}</h3>
             <p class="text-muted mb-0">&#64;{{ profileUsername }} | {{ profileEmail }}</p>
           </div>
-          <span class="badge bg-primary fs-6" *ngIf="isAdmin"><i class="fas fa-shield-alt me-1"></i> Modo: Admin</span>
+          <span class="badge bg-primary fs-6" *ngIf="isAdmin"><i class="fas fa-shield-alt me-1"></i> Administrador</span>
         </div>
 
         <hr class="my-3">
@@ -76,7 +113,7 @@
     <li class="nav-item">
       <a class="nav-link" [class.active]="activeTab === 'notifications'" href="javascript:void(0)" (click)="setTab('notifications')">
         <i class="fas fa-bell me-2" [class.text-warning]="unreadNotificationsCount > 0"></i> Notificaciones
-        <span class="badge bg-danger rounded-pill ms-1" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
+        <span class="badge bg-danger rounded-pill ms-2" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
       </a>
     </li>
     <li class="nav-item" *ngIf="isAdmin">
@@ -158,11 +195,19 @@
     <div class="tab-pane fade" [class.show]="activeTab === 'notifications'" [class.active]="activeTab === 'notifications'" *ngIf="activeTab === 'notifications'">
       <div class="card shadow-sm border-0">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="card-title mb-0 fw-bold text-dark"><i class="fas fa-bell text-warning me-2"></i>Centro de Notificaciones</h4>
-            <button class="btn btn-outline-primary btn-sm" (click)="markAllAsRead()" [disabled]="unreadNotificationsCount === 0">
-              <i class="fas fa-check-double me-1"></i> Marcar todas como leídas
-            </button>
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div class="d-flex align-items-center">
+              <h4 class="card-title mb-0 fw-bold text-dark"><i class="fas fa-bell text-warning me-2"></i>Centro de Notificaciones</h4>
+              <span class="badge bg-danger rounded-pill ms-2" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-outline-primary" (click)="triggerTestNotification()" [disabled]="simulatingNotification" title="Simular un aviso en tiempo real sobre un destino favorito">
+                <i class="fas fa-bell me-1"></i> {{ simulatingNotification ? 'Generando...' : 'Simular Alerta en Vivo' }}
+              </button>
+              <button class="btn btn-outline-secondary" (click)="markAllAsRead()" [disabled]="unreadNotificationsCount === 0">
+                <i class="fas fa-check-double me-1"></i> Marcar todas como leídas
+              </button>
+            </div>
           </div>
           
           <div class="list-group">
@@ -171,15 +216,22 @@
                  [class.border-light]="notif.isRead"
                  [class.bg-light]="notif.isRead"
                  *ngFor="let notif of notifications">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1 fw-bold text-dark">{{ notif.title }}</h5>
-                <small class="text-muted">{{ notif.creationTime | date:'dd/MM/yyyy HH:mm' }}</small>
+              <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                  <i class="fas fa-bell" [class.text-warning]="!notif.isRead" [class.text-muted]="notif.isRead"></i>
+                  <span>{{ notif.title }}</span>
+                </h5>
+                <small class="text-muted"><i class="far fa-clock me-1"></i>{{ notif.creationTime | date:'dd/MM/yyyy HH:mm' }}</small>
               </div>
               <p class="mb-2 text-muted">{{ notif.message }}</p>
               <div class="d-flex justify-content-between align-items-center">
                 <div>
-                  <span class="badge bg-success me-1" *ngIf="notif.isRead">Leída</span>
-                  <span class="badge bg-warning text-dark" *ngIf="!notif.isRead">Nueva</span>
+                  <span class="badge bg-warning text-dark me-1" *ngIf="!notif.isRead">
+                    <i class="fas fa-circle me-1 small"></i>Nueva
+                  </span>
+                  <span class="badge bg-success me-1" *ngIf="notif.isRead">
+                    <i class="fas fa-check me-1"></i>Leída
+                  </span>
                 </div>
                 <button class="btn btn-sm btn-link p-0 text-decoration-none text-primary fw-semibold" *ngIf="!notif.isRead" (click)="markAsRead(notif.id)">
                   <i class="fas fa-envelope-open me-1"></i> Marcar como leída

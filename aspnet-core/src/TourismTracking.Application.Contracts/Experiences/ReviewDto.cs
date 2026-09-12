@@ -9,5 +9,9 @@ namespace TourismTracking.Experiences
         public string Comment { get; set; }
         public Guid UserId { get; set; }
         public Guid DestinationId { get; set; }
+
+        public string? AuthorName { get; set; }
+        public string? AuthorUsername { get; set; }
+        public string? AuthorAvatar { get; set; }
     }
 }

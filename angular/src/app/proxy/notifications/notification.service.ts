@@ -32,5 +32,16 @@ export class NotificationService {
     },
     { apiName: this.apiName,...config });
 
+  sendTestNotification = (destinationId?: string, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, NotificationDto>({
+      method: 'POST',
+      url: '/api/app/notification/send-test-notification',
+      params: { destinationId },
+    },
+    { apiName: this.apiName,...config });
+
+  createTestNotification = (destinationId?: string, config?: Partial<Rest.Config>) =>
+    this.sendTestNotification(destinationId, config);
+
   constructor(private restService: RestService) {}
 }

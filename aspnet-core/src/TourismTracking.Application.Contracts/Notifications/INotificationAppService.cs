@@ -10,5 +10,6 @@ namespace TourismTracking.Notifications
         Task<List<NotificationDto>> GetMyNotificationsAsync();
         Task MarkAsReadAsync(Guid id);
         Task MarkAllAsReadAsync();
+        Task<NotificationDto> SendTestNotificationAsync(Guid? destinationId = null);
     }
 }
