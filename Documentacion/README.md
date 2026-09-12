@@ -2,7 +2,7 @@
 
 ¡Bienvenido al repositorio documental del proyecto **TourismTracking (WanderTrack)**! Este directorio centraliza toda la información técnica, de arquitectura y de seguimiento requerida para la defensa del Trabajo Práctico Final de la materia **Desarrollo de Software (UTN-FRCU, Ciclo Lectivo 2025 - Cátedra Prof. Enzo Tanga)**.
 
-Este espacio está organizado en Markdown para facilitar la lectura, el control de versiones y el trabajo colaborativo entre **Thiago JGK y Exequiel**.
+Este espacio está organizado en Markdown para facilitar la lectura, el control de versiones y el seguimiento del desarrollo por parte del alumno **Thiago Jesús Gómez Kehler**.
 
 ---
 
@@ -14,12 +14,7 @@ A continuación se indexan los documentos técnicos y normativos del proyecto:
 * **[Condiciones de Aprobación 2025](./Condiciones_Aprobacion_2025.md):** El subconjunto exacto de operaciones de Backend y Frontend requeridas para la promoción de la materia.
 * **[Pliego de Requerimientos TP Final v0.1](./TP_Final_v0.1.md):** Especificación completa de objetivos, flujos del sistema y tablas detalladas de Requerimientos Funcionales (RF) y No Funcionales (RNF).
 * **[Matriz de Operaciones del Sistema v1.0](./Operaciones_Sistema_v1.0.md):** Matriz de trazabilidad y control de avance de todas las operaciones del sistema.
-
-### 👥 Onboarding y Colaboración Técnica
-* **[Guía de Colaboración Git y Flujo de Trabajo](./Guia_Colaboracion_Git.md):** Protocolo de integración continua en local (`dev` branch, rebases y validaciones obligatorias) y protección en producción (`prod` branch, revisiones cruzadas y Pull Requests de entrega).
-* **[Hoja de Ruta de Desarrollo](./Hoja_Ruta_Desarrollo_Exequiel.md):** Matriz de tareas de implementación de Frontend, Backend, persistencia y suite de pruebas con especificaciones técnicas y criterios de aceptación.
-* **[Guía Maestra de Onboarding](./Guia_Onboarding_Exequiel.md):** Manual de instalación de dependencias (.NET 8 SDK, Node.js, SQL Server, DbMigrator) y puesta en marcha del entorno local.
-* **[Manual Maestro de Desarrollo (HTML)](./Manual_Maestro_Exequiel.html):** Manual interactivo en formato editorial A4 con arquitectura DDD, flujo Git y Spec-Driven Development.
+* **[Informe Técnico de Estado Avanzado](./REVISION_PREVIA_ACADEMICA.md):** Documento técnico exhaustivo con la evidencia de pruebas, arquitectura y estado de avance presentado para revisión previa.
 
 ### 📐 Arquitectura, UML e Informes Técnicos
 * **[Justificación Arquitectónica y Data Flow](./Justificacion_Arquitectonica.md):** Fundamentación del diseño DDD sobre ABP Framework v8.3.4, desacoplamiento modular y diagramas de flujo de datos extremo a extremo.

@@ -6,10 +6,10 @@
 [![Tests](https://img.shields.io/badge/Unit%20Tests-55%2F55%20Passed-success)]()
 [![UTN FRCU](https://img.shields.io/badge/UTN-FRCU%202025-006699)](https://www.frcu.utn.edu.ar/)
 
-> **Trabajo Práctico Final de Cátedra — Desarrollo de Software (Año 2025)**  
+> **Trabajo Práctico de Cátedra — Desarrollo de Software (Año 2025)**  
 > **Institución:** Universidad Tecnológica Nacional — Facultad Regional Concepción del Uruguay (UTN - FRCU)  
 > **Docente Titular:** Prof. Enzo Tanga  
-> **Equipo de Desarrollo:** Thiago Jesús Gomez Kehler & Exequiel  
+> **Alumno:** Thiago Jesús Gómez Kehler  
 
 ---
 
@@ -158,12 +158,9 @@ Total time: ~3.8 Segundos
 ---
 
 ## 📚 Enlaces al Centro de Documentación
-
-* [Centro de Documentación General](./Documentacion/README.md)
+ 
 * [Condiciones de Aprobación de Cátedra](./Documentacion/Condiciones_Aprobacion_2025.md)
-* [Guía de Colaboración Git y Flujo de Trabajo](./Documentacion/Guia_Colaboracion_Git.md)
-* [Plan de Trabajo y Hoja de Ruta Técnica](./Documentacion/Hoja_Ruta_Desarrollo_Exequiel.md)
-* [Guía Maestra de Onboarding Técnico](./Documentacion/Guia_Onboarding_Exequiel.md)
+* [Matriz de Operaciones del Sistema (Checklist)](./Documentacion/Operaciones_Sistema_v1.0.md)
 * [Justificación Arquitectónica y Data Flow](./Documentacion/Justificacion_Arquitectonica.md)
-* [Modelos y Diagramas UML (Mermaid)](./Documentacion/diagramas_uml.md)
-* [Manual Maestro de Desarrollo (HTML Editorial)](./Documentacion/Manual_Maestro_Exequiel.html)
+* [Modelos del Dominio y Diagramas UML](./Documentacion/diagramas_uml.md)
+* [Informe Técnico de Estado Avanzado para Revisión](./Documentacion/REVISION_PREVIA_ACADEMICA.md)

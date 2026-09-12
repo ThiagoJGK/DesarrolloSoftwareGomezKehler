@@ -53,7 +53,7 @@
   - `Task<ExperienceDto> CreateExperienceAsync(Guid destinationId, string title, string content, string? keywords = null);`
   - `Task<ExperienceDto> EditExperienceAsync(Guid id, string title, string content, string? keywords = null);`
 - `INotificationAppService`:
-  - `Task<NotificationDto> SendTestNotificationAsync(Guid? destinationId = null);`
+  - `Task<NotificationDto> SendTestNotificationAsync();`
 
 ## Code Layout
 - Backend Source: `aspnet-core/src/`
