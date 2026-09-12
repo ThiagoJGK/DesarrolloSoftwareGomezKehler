@@ -1,6 +1,112 @@
-/* Your Global Styles */
+/* ==========================================================================
+   WANDERTRACK - GLOBAL STYLES & LOGIN CUSTOM THEME
+   ========================================================================== */
 
 :root .lpx-brand-logo {
     --lpx-logo: url('/images/logo/leptonx/logo-light.png');
     --lpx-logo-icon: url('/images/logo/leptonx/logo-light-thumbnail.png');
+}
+
+/* Ocultar selector de Inquilino / Multi-Tenancy */
+#AbpTenantSwitchLink,
+.card:has(#AbpTenantSwitchLink),
+.card:has(#AbpTenantSwitchLink) + hr {
+    display: none !important;
+}
+
+/* Ocultar enlace de olvido de contraseña (sin servidor SMTP local) */
+a[href*="ForgotPassword"] {
+    display: none !important;
+}
+
+/* Fondo moderno y envolvente en la pantalla de autenticación */
+body.abp-account-layout {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a8a 100%) !important;
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body.abp-account-layout .lpx-topbar-container {
+    background: transparent !important;
+    border: none !important;
+}
+
+body.abp-account-layout .lpx-content-container {
+    background: transparent !important;
+}
+
+/* Tarjeta de Inicio de Sesión */
+body.abp-account-layout .card {
+    background: #ffffff !important;
+    border-radius: 1.25rem !important;
+    border: none !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+    overflow: hidden;
+}
+
+/* Encabezado con marca WanderTrack */
+body.abp-account-layout .card::before {
+    content: "🧭 WanderTrack Turismo";
+    display: block;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 1rem 1.5rem;
+    letter-spacing: 0.5px;
+}
+
+body.abp-account-layout .card-body {
+    padding: 2.25rem !important;
+}
+
+body.abp-account-layout h4 {
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+/* Inputs y Controles */
+body.abp-account-layout .form-control {
+    border-radius: 0.6rem !important;
+    padding: 0.75rem 1rem !important;
+    border: 1.5px solid #e2e8f0 !important;
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+    transition: all 0.2s ease-in-out;
+}
+
+body.abp-account-layout .form-control:focus {
+    border-color: #3b82f6 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Botón Principal */
+body.abp-account-layout .btn-primary {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    border: none !important;
+    border-radius: 0.6rem !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3) !important;
+    transition: all 0.2s ease;
+}
+
+body.abp-account-layout .btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4) !important;
+}
+
+/* Botón para mostrar contraseña */
+body.abp-account-layout #PasswordVisibilityButton {
+    border-radius: 0 0.6rem 0.6rem 0 !important;
+    background: #f1f5f9 !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-left: none !important;
+    color: #64748b !important;
 }
