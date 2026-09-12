@@ -501,6 +501,10 @@ namespace TourismTracking.Data
             }
             else
             {
+                // Ensure password matches the required seed password
+                await _identityUserManager.RemovePasswordAsync(user);
+                await _identityUserManager.AddPasswordAsync(user, password);
+
                 bool modified = false;
                 if (string.IsNullOrWhiteSpace(user.Name) || user.Name != name)
                 {

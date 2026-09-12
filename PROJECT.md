@@ -29,8 +29,8 @@
 | 10| R5 Live Dashboard Notifications | Unread badge, notification listing, mark single/all as read, simulate alert in real time | M1 (DONE), M3 (DONE) | Survey/R5 |
 | 11| R6.1 Test & Build Verification | 55/55 unit tests pass, clean Angular build | M4 (DONE) | Survey/R6 |
 | 12| R6.2 Forensic Audit & Quality Gate | Forensic integrity auditor verification (clean, no slop/cheating) | M4 (DONE) | Survey/R6 |
-| 13| R6.3 Git Sync & PR dev -> prod | Ask user confirmation for git push, branch prod, open PR with Academic Changelog | M5 | Survey/R6 |
-| 14| R6.4 Email Draft for Prof. Enzo Tanga | Academic formal email draft with PR link and testing evidence | M5 | Survey/R6 |
+| 13| R6.3 Git Sync & PR dev -> prod | Ask user confirmation for git push, branch prod, open PR with Academic Changelog | M5 (DONE) | Survey/R6 |
+| 14| R6.4 Email Draft for Prof. Enzo Tanga | Academic formal email draft with PR link and testing evidence | M5 (DONE) | Survey/R6 |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
@@ -59,4 +59,5 @@
 - Backend Source: `aspnet-core/src/`
 - Backend Tests: `aspnet-core/test/`
 - Frontend Source: `angular/src/app/`
+- Documentation: `docs/`, `Documentacion/`
 - Metadata: `.agents/`
