@@ -240,7 +240,7 @@ Siguiendo lo que me indicaste por correo para poder coordinar la inscripción a 
 Te comparto los enlaces y la información de acceso para que puedas revisarlo cuando tengas oportunidad:
 
 * Repositorio en GitHub: https://github.com/ThiagoJGK/DesarrolloSoftwareGomezKehler
-* Pull Request (dev ➔ prod): https://github.com/ThiagoJGK/DesarrolloSoftwareGomezKehler/pull/new/dev
+* Pull Request (dev ➔ prod): https://github.com/ThiagoJGK/DesarrolloSoftwareGomezKehler/pull/1
 * Informe Técnico & Matriz de Requerimientos: Se encuentra documentado en detalle dentro del archivo Documentacion/REVISION_PREVIA_ACADEMICA.md en el repositorio.
 
 Credenciales para la navegación interactiva:
