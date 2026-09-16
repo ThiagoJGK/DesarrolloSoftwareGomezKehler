@@ -8,6 +8,9 @@ using Volo.Abp.Users;
 using Xunit;
 using TourismTracking.Experiences;
 using System.Linq;
+using Volo.Abp.DependencyInjection;
+using Volo.Abp.ObjectMapping;
+using Volo.Abp.Guids;
 
 namespace TourismTracking.Application.Tests.Experiences
 {
@@ -26,12 +29,25 @@ namespace TourismTracking.Application.Tests.Experiences
             _favoritesRepo = Substitute.For<IRepository<FavoriteListItem, Guid>>();
             _currentUser = Substitute.For<ICurrentUser>();
 
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            
+            var objectMapper = new SimpleTestObjectMapper();
+            
+            var guidGenerator = Substitute.For<IGuidGenerator>();
+            guidGenerator.Create().Returns(Guid.NewGuid());
+
+            serviceProvider.GetService(typeof(IObjectMapper)).Returns(objectMapper);
+            serviceProvider.GetService(typeof(IGuidGenerator)).Returns(guidGenerator);
+
+            var lazyServiceProvider = new AbpLazyServiceProvider(serviceProvider);
+
             _appService = new TourismInteractionAppService(
                 _reviewRepo,
                 _experienceRepo,
                 _favoritesRepo,
                 _currentUser
             );
+            _appService.LazyServiceProvider = lazyServiceProvider;
         }
 
         [Fact]
@@ -91,6 +107,149 @@ namespace TourismTracking.Application.Tests.Experiences
             });
             
             ex.Message.ShouldContain("Cannot delete someone else's review");
+        }
+
+        [Fact]
+        public async Task EditReviewAsync_Should_Throw_If_Not_Author()
+        {
+            // Arrange
+            var currentUserId = Guid.NewGuid();
+            var authorUserId = Guid.NewGuid();
+            var reviewId = Guid.NewGuid();
+            
+            _currentUser.Id.Returns(currentUserId);
+            var review = new Review(reviewId, Guid.NewGuid(), authorUserId, 4, "Original");
+            _reviewRepo.GetAsync(reviewId).Returns(Task.FromResult(review));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
+            {
+                await _appService.EditReviewAsync(reviewId, 5, "Hacked");
+            });
+        }
+
+        [Fact]
+        public async Task GetDestinationAverageRatingAsync_Should_Return_Zero_For_No_Reviews()
+        {
+            // Arrange
+            var destinationId = Guid.NewGuid();
+            _reviewRepo.GetListAsync(Arg.Any<System.Linq.Expressions.Expression<Func<Review, bool>>>())
+                .Returns(Task.FromResult(new List<Review>()));
+
+            // Act
+            var result = await _appService.GetDestinationAverageRatingAsync(destinationId);
+
+            // Assert
+            result.AverageRating.ShouldBe(0);
+            result.TotalReviews.ShouldBe(0);
+        }
+
+        [Fact]
+        public async Task AddToFavoritesAsync_Should_Throw_If_Not_Logged_In()
+        {
+            // Arrange
+            _currentUser.Id.Returns((Guid?)null);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
+            {
+                await _appService.AddToFavoritesAsync(Guid.NewGuid());
+            });
+        }
+
+        [Fact]
+        public async Task RemoveFromFavoritesAsync_Should_Throw_If_Not_Logged_In()
+        {
+            // Arrange
+            _currentUser.Id.Returns((Guid?)null);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
+            {
+                await _appService.RemoveFromFavoritesAsync(Guid.NewGuid());
+            });
+        }
+
+        [Fact]
+        public async Task GetMyFavoriteDestinationsAsync_Should_Return_Empty_If_Not_Logged_In()
+        {
+            // Arrange
+            _currentUser.Id.Returns((Guid?)null);
+
+            // Act
+            var result = await _appService.GetMyFavoriteDestinationsAsync();
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldBeEmpty();
+        }
+
+        [Fact]
+        public async Task DeleteExperienceAsync_Should_Throw_If_Not_Author()
+        {
+            // Arrange
+            var currentUserId = Guid.NewGuid();
+            var authorUserId = Guid.NewGuid();
+            var experienceId = Guid.NewGuid();
+            
+            _currentUser.Id.Returns(currentUserId);
+            var experience = new Experience(experienceId, Guid.NewGuid(), authorUserId, "Title", "Content", "tags");
+            _experienceRepo.GetAsync(experienceId).Returns(Task.FromResult(experience));
+
+            // Act & Assert
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
+            {
+                await _appService.DeleteExperienceAsync(experienceId);
+            });
+        }
+
+        [Fact]
+        public async Task CreateExperienceAsync_Should_Throw_If_Not_Logged_In()
+        {
+            // Arrange
+            _currentUser.Id.Returns((Guid?)null);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
+            {
+                await _appService.CreateExperienceAsync(Guid.NewGuid(), "Title", "Content", "tags");
+            });
+        }
+
+        [Fact]
+        public async Task AddReviewAsync_Should_Create_Review_Successfully()
+        {
+            // Arrange
+            var currentUserId = Guid.NewGuid();
+            var destinationId = Guid.NewGuid();
+            _currentUser.Id.Returns(currentUserId);
+
+            // Act
+            var result = await _appService.AddReviewAsync(destinationId, 5, "Excelente destino");
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.Rating.ShouldBe(5);
+            result.Comment.ShouldBe("Excelente destino");
+            await _reviewRepo.Received(1).InsertAsync(Arg.Any<Review>());
+        }
+
+        [Fact]
+        public async Task AddToFavoritesAsync_Should_Add_If_Not_Exists()
+        {
+            // Arrange
+            var currentUserId = Guid.NewGuid();
+            var destinationId = Guid.NewGuid();
+            _currentUser.Id.Returns(currentUserId);
+            
+            _favoritesRepo.AnyAsync(Arg.Any<System.Linq.Expressions.Expression<Func<FavoriteListItem, bool>>>())
+                .Returns(Task.FromResult(false));
+
+            // Act
+            await _appService.AddToFavoritesAsync(destinationId);
+
+            // Assert
+            await _favoritesRepo.Received(1).InsertAsync(Arg.Any<FavoriteListItem>());
         }
     }
 }

@@ -4,13 +4,19 @@
   <div class="row mb-5">
     <div class="col-md-8">
       <div class="card shadow-sm border-0">
-        <img [src]="destination.imageUrl" class="card-img-top" alt="Destination Image" style="height: 400px; object-fit: cover;">
+        <img [src]="destination.imageUrl || defaultFallbackImage" (error)="onImgError($event)" class="card-img-top" alt="Destination Image" style="height: 400px; object-fit: cover;">
         <div class="card-body">
-          <h1 class="card-title fw-bold text-dark">{{ destination.name }}</h1>
-          <p class="text-muted fs-5"><i class="fas fa-map-marker-alt text-danger me-2"></i> {{ destination.country }}</p>
-          <div class="d-flex align-items-center mt-3">
-             <i class="fas fa-users text-info me-2"></i>
-             <span class="fw-semibold">Población: {{ destination.population | number }}</span>
+          <h1 class="card-title fw-bold text-dark mb-1">{{ destination.name }}</h1>
+          <p class="text-muted fs-5 mb-3"><i class="fas fa-map-marker-alt text-danger me-2"></i> {{ destination.country }}</p>
+          <div class="d-flex align-items-center gap-4 flex-wrap text-secondary">
+            <div>
+              <i class="fas fa-users text-info me-2"></i>
+              <span class="fw-semibold">Población: {{ destination.population | number }} hab.</span>
+            </div>
+            <div>
+              <i class="fas fa-compass text-primary me-2"></i>
+              <span class="fw-semibold">Coordenadas: Lat: {{ destination.latitude | number:'1.2-4' }}°, Long: {{ destination.longitude | number:'1.2-4' }}°</span>
+            </div>
           </div>
         </div>
       </div>
@@ -28,8 +34,14 @@
         </div>
         <p class="text-muted mt-2">{{ metrics?.totalReviews || 0 }} reseñas contabilizadas</p>
         <hr>
-        <button class="btn btn-outline-danger w-100 mb-2">
-          <i class="fas fa-heart me-2"></i> Agregar a Favoritos
+        <button 
+          class="btn w-100 mb-2"
+          [class.btn-danger]="isFavorite"
+          [class.btn-outline-danger]="!isFavorite"
+          [disabled]="togglingFavorite"
+          (click)="toggleFavorite()">
+          <i [class]="isFavorite ? 'fas fa-heart me-2' : 'far fa-heart me-2'"></i>
+          {{ isFavorite ? 'Quitar de Favoritos' : 'Agregar a Favoritos' }}
         </button>
       </div>
     </div>
@@ -38,18 +50,66 @@
   <div class="row">
     <!-- Columna de Reseñas -->
     <div class="col-md-6">
-      <h3 class="border-bottom pb-2 mb-4"><i class="fas fa-comments me-2"></i>Reseñas</h3>
+      <h3 class="border-bottom pb-2 mb-3"><i class="fas fa-comments me-2"></i>Reseñas</h3>
+
+      <!-- Filtro de Reseñas por Valoración -->
+      <div class="btn-group btn-group-sm mb-3 w-100" role="group">
+        <button type="button" class="btn" [class.btn-primary]="selectedRatingFilter === 'all'" [class.btn-outline-primary]="selectedRatingFilter !== 'all'" (click)="setRatingFilter('all')">Todas</button>
+        <button type="button" class="btn" [class.btn-success]="selectedRatingFilter === 'positive'" [class.btn-outline-success]="selectedRatingFilter !== 'positive'" (click)="setRatingFilter('positive')">Positivas (4-5 ⭐)</button>
+        <button type="button" class="btn" [class.btn-warning]="selectedRatingFilter === 'neutral'" [class.btn-outline-warning]="selectedRatingFilter !== 'neutral'" (click)="setRatingFilter('neutral')">Neutrales (3 ⭐)</button>
+        <button type="button" class="btn" [class.btn-danger]="selectedRatingFilter === 'negative'" [class.btn-outline-danger]="selectedRatingFilter !== 'negative'" (click)="setRatingFilter('negative')">Negativas (1-2 ⭐)</button>
+      </div>
       
       <!-- Lista de Reseñas -->
       <div class="mb-4">
         <div class="card mb-3 shadow-sm border-0" *ngFor="let rev of reviews">
           <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <h6 class="fw-bold"><i class="fas fa-user-circle me-1"></i> Usuario Anónimo</h6>
-              <span class="badge bg-warning text-dark"><i class="fas fa-star"></i> {{ rev.rating }}</span>
+            <!-- Modo visualización -->
+            <div *ngIf="editingReviewId !== rev.id">
+              <div class="d-flex justify-content-between align-items-center">
+                <div 
+                  class="d-flex align-items-center gap-2" 
+                  style="cursor: pointer;" 
+                  (click)="openPublicProfile(rev.userId)" 
+                  [title]="'Ver perfil de ' + getAuthorName(rev)">
+                  <img 
+                    [src]="getAuthorAvatar(rev)" 
+                    class="rounded-circle border shadow-sm" 
+                    style="width: 38px; height: 38px; object-fit: cover;" 
+                    alt="Avatar">
+                  <div>
+                    <h6 class="fw-bold text-primary mb-0 text-decoration-underline">{{ getAuthorName(rev) }}</h6>
+                    <small class="text-muted" *ngIf="getAuthorUsername(rev)">{{ getAuthorUsername(rev) }}</small>
+                  </div>
+                </div>
+                <span class="badge bg-warning text-dark fs-6"><i class="fas fa-star me-1"></i>{{ rev.rating }}</span>
+              </div>
+              <p class="card-text mt-3 mb-2">{{ rev.comment }}</p>
+              <div class="d-flex justify-content-end align-items-center" *ngIf="rev.userId === currentUserId">
+                <div>
+                  <button class="btn btn-sm btn-outline-primary me-1" (click)="startEditReview(rev)" title="Editar reseña">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteReview(rev.id || '')" title="Eliminar reseña">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
             </div>
-            <p class="card-text mt-2">{{ rev.comment }}</p>
-            <small class="text-muted">Fecha: {{ rev.lastModificationTime || rev.creationTime | date }}</small>
+            <!-- Modo edición -->
+            <div *ngIf="editingReviewId === rev.id">
+              <h6 class="fw-bold text-primary"><i class="fas fa-edit me-1"></i> Editando Reseña</h6>
+              <div class="mb-2">
+                <label class="form-label">Estrellas (1-5)</label>
+                <input type="number" class="form-control w-25" min="1" max="5" [(ngModel)]="editReviewData.rating">
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Comentario</label>
+                <textarea class="form-control" rows="2" [(ngModel)]="editReviewData.comment"></textarea>
+              </div>
+              <button class="btn btn-sm btn-success me-1" (click)="saveEditReview()"><i class="fas fa-check"></i> Guardar</button>
+              <button class="btn btn-sm btn-secondary" (click)="cancelEditReview()"><i class="fas fa-times"></i> Cancelar</button>
+            </div>
           </div>
         </div>
         <div class="alert alert-secondary" *ngIf="reviews.length === 0">No hay reseñas para mostrar. ¡Sé el primero!</div>
@@ -72,13 +132,36 @@
 
     <!-- Columna de Experiencias -->
     <div class="col-md-6">
-      <h3 class="border-bottom pb-2 mb-4"><i class="fas fa-book-open me-2"></i>Diarios de Viaje (Experiencias)</h3>
+      <h3 class="border-bottom pb-2 mb-3"><i class="fas fa-book-open me-2"></i>Diarios de Viaje (Experiencias)</h3>
+      
+      <!-- Filtro de palabras clave de Experiencias -->
+      <div class="input-group input-group-sm mb-3">
+        <input type="text" class="form-control" placeholder="Filtrar por palabra clave (ej. gastronomía, seguridad)..." [(ngModel)]="experienceKeywordFilter" (keyup.enter)="loadExperiences()">
+        <button class="btn btn-outline-info" type="button" (click)="loadExperiences()"><i class="fas fa-search me-1"></i>Filtrar</button>
+        <button class="btn btn-outline-secondary" type="button" (click)="experienceKeywordFilter = ''; loadExperiences()"><i class="fas fa-undo me-1"></i>Limpiar</button>
+      </div>
       
       <!-- Lista de Experiencias -->
       <div class="mb-4">
         <div class="card mb-3 shadow-sm border-0 border-start border-4 border-info" *ngFor="let exp of experiences">
           <div class="card-body">
-            <h5 class="fw-bold text-info">{{ exp.title }}</h5>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold text-info mb-0">{{ exp.title }}</h5>
+              <div 
+                class="d-flex align-items-center gap-2" 
+                style="cursor: pointer;" 
+                (click)="openPublicProfile(exp.userId)" 
+                [title]="'Ver perfil de ' + getAuthorName(exp)">
+                <img 
+                  [src]="getAuthorAvatar(exp)" 
+                  class="rounded-circle border shadow-sm" 
+                  style="width: 28px; height: 28px; object-fit: cover;" 
+                  alt="Avatar">
+                <span class="text-primary small fw-semibold text-decoration-underline">
+                  {{ getAuthorName(exp) }}
+                </span>
+              </div>
+            </div>
             <p class="card-text">{{ exp.content }}</p>
             <div class="mt-2">
               <span class="badge bg-secondary me-1" *ngFor="let tag of exp.keywords?.split(',')">{{ tag.trim() }}</span>
@@ -100,10 +183,17 @@
           <textarea class="form-control" rows="4" [(ngModel)]="newExperience.content"></textarea>
         </div>
         <div class="mb-3">
-          <label>Palabras clave (separadas por coma)</label>
-          <input type="text" class="form-control" placeholder="Ej: comida, museo, peligro" [(ngModel)]="newExperience.keywords">
+          <label class="form-label fw-semibold">Palabras Clave <small class="text-muted">(Opcional)</small></label>
+          <input type="text" class="form-control" placeholder="Ej: gastronomía, cultura, naturaleza" [(ngModel)]="newExperience.keywords">
+          <div class="d-flex align-items-center gap-1 mt-2 flex-wrap">
+            <span class="small text-muted me-1">Sugerencias rápidas:</span>
+            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 rounded-pill" (click)="addKeywordTag('naturaleza')">+ naturaleza</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 rounded-pill" (click)="addKeywordTag('gastronomía')">+ gastronomía</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 rounded-pill" (click)="addKeywordTag('cultura')">+ cultura</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 rounded-pill" (click)="addKeywordTag('aventura')">+ aventura</button>
+          </div>
         </div>
-        <button class="btn btn-info text-white" (click)="submitActionExperience()">Publicar Diarios</button>
+        <button class="btn btn-info text-white" (click)="submitActionExperience()">Publicar Diario</button>
       </div>
     </div>
   </div>
@@ -114,4 +204,34 @@
     <span class="visually-hidden">Loading...</span>
   </div>
   <h4 class="mt-3">Cargando detalles de destino...</h4>
+</div>
+
+<!-- Modal de Perfil Público -->
+<div class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);" *ngIf="showProfileModal && selectedUserProfile">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold"><i class="fas fa-user-circle me-2"></i>Perfil Público</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeProfileModal()"></button>
+      </div>
+      <div class="modal-body text-center p-4">
+        <div class="mb-3">
+          <img *ngIf="selectedUserProfile.photo" [src]="selectedUserProfile.photo" class="rounded-circle border shadow-sm" style="width: 120px; height: 120px; object-fit: cover;" alt="Avatar">
+          <div *ngIf="!selectedUserProfile.photo" class="rounded-circle border bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm mx-auto" style="width: 120px; height: 120px; font-size: 4rem;">
+            <i class="fas fa-user-circle"></i>
+          </div>
+        </div>
+        <h4 class="fw-bold mb-1">{{ selectedUserProfile.name }} {{ selectedUserProfile.surname }}</h4>
+        <p class="text-muted mb-3">&#64;{{ selectedUserProfile.userName }}</p>
+        
+        <div class="card bg-light border-0 p-3 text-start">
+          <h6 class="fw-bold text-secondary mb-2"><i class="fas fa-heart text-danger me-2"></i>Preferencias de Viaje</h6>
+          <p class="mb-0 text-dark" style="white-space: pre-line;">{{ selectedUserProfile.preferences || 'Este usuario aún no ha agregado preferencias.' }}</p>
+        </div>
+      </div>
+      <div class="modal-footer bg-light border-top-0">
+        <button type="button" class="btn btn-secondary w-100" (click)="closeProfileModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
 </div>

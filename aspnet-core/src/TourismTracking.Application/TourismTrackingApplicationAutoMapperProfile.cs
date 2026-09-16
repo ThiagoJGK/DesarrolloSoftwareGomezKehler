@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+using AutoMapper;
+using TourismTracking.Destinations;
+using TourismTracking.Experiences;
 
 namespace TourismTracking;
 
@@ -6,8 +8,10 @@ public class TourismTrackingApplicationAutoMapperProfile : Profile
 {
     public TourismTrackingApplicationAutoMapperProfile()
     {
-        /* You can configure your AutoMapper mapping configuration here.
-         * Alternatively, you can split your mapping configurations
-         * into multiple profile classes for a better organization. */
+        CreateMap<Destination, DestinationDto>();
+        CreateMap<Review, ReviewDto>();
+        CreateMap<Experience, ExperienceDto>();
+        CreateMap<Notifications.Notification, Notifications.NotificationDto>();
+        CreateMap<Metrics.ApiMetric, Metrics.ApiMetricDto>();
     }
 }

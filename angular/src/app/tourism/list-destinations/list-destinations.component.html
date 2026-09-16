@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <div class="p-5 text-center bg-dark text-white rounded shadow-sm mb-4" style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);">
     <h1 class="display-4 fw-bold">Descubre tu próximo destino</h1>
-    <p class="lead">Busca ciudades en todo el mundo y guarda tus favoritas.</p>
+    <p class="lead">Busca ciudades en todo el mundo con geolocalización precisa e imágenes representativas.</p>
     
     <div class="row justify-content-center mt-4">
       <div class="col-md-8">
@@ -9,7 +9,7 @@
           <input 
             type="text" 
             class="form-control" 
-            placeholder="Ej. Paris, Tokyo, Mendoza..." 
+            placeholder="Ej. Mendoza, Bariloche, Córdoba, Paris, Tokyo, Roma..." 
             [(ngModel)]="searchQuery"
             (keyup.enter)="search()"
           >
@@ -17,25 +17,86 @@
             <i class="fas fa-search me-2"></i> {{ isSearching ? 'Buscando...' : 'Buscar' }}
           </button>
         </div>
+
+        <!-- Filtros Avanzados -->
+        <div class="text-start mt-3">
+          <button class="btn btn-outline-light btn-sm d-inline-flex align-items-center gap-1" type="button" (click)="toggleAdvancedFilters()">
+            <i class="fas fa-sliders-h me-1"></i> Filtros Avanzados
+            <span *ngIf="hasActiveFilters" class="badge bg-primary ms-1">Activos</span>
+            <i class="fas ms-1" [class.fa-chevron-down]="!isAdvancedFiltersOpen" [class.fa-chevron-up]="isAdvancedFiltersOpen"></i>
+          </button>
+          <div class="collapse mt-2" [class.show]="isAdvancedFiltersOpen" id="advancedFilters">
+            <div class="card card-body bg-dark text-white border-secondary p-3 shadow">
+              <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                  <label class="form-label small mb-1">País (Código 2 letras)</label>
+                  <input type="text" class="form-control form-control-sm bg-secondary text-white border-0" placeholder="Ej. AR, US, ES, FR" [(ngModel)]="countryFilter" maxlength="2">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small mb-1">Región / Provincia</label>
+                  <input type="text" class="form-control form-control-sm bg-secondary text-white border-0" placeholder="Ej. Mendoza, Entre Ríos, Cataluña" [(ngModel)]="regionFilter">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small mb-1">Población Mínima</label>
+                  <input type="number" class="form-control form-control-sm bg-secondary text-white border-0" placeholder="Ej. 50000" [(ngModel)]="minPopulationFilter">
+                </div>
+                <div class="col-md-2 d-flex gap-1">
+                  <button class="btn btn-outline-warning btn-sm w-100" type="button" (click)="clearFilters()" [disabled]="!hasActiveFilters" title="Restablecer filtros">
+                    <i class="fas fa-undo me-1"></i> Limpiar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
+  <!-- Alerta cuando no hay resultados de búsqueda -->
+  <div *ngIf="hasSearched && searchResults.length === 0 && !isSearching" class="alert alert-warning text-center shadow-sm mb-4">
+    <i class="fas fa-info-circle me-2"></i> No se encontraron destinos para "<strong>{{ searchQuery }}</strong>". Intenta con otra ciudad o ajusta los filtros avanzados.
+  </div>
+
   <!-- Resultados de Búsqueda Externos -->
   <div *ngIf="searchResults.length > 0" class="mb-5">
-    <h3 class="mb-3 border-bottom pb-2">Resultados de Búsqueda</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+      <h3 class="mb-0">Resultados de Búsqueda</h3>
+      <span class="badge bg-primary fs-6">{{ searchResults.length }} destinos encontrados</span>
+    </div>
     <div class="row row-cols-1 row-cols-md-3 g-4">
       <div class="col" *ngFor="let dest of searchResults">
-        <div class="card h-100 shadow-sm">
-          <img [src]="dest.imageUrl || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&q=80&w=800'" class="card-img-top" alt="City" style="height: 200px; object-fit: cover;">
-          <div class="card-body">
-            <h5 class="card-title">{{ dest.name }}</h5>
-            <p class="card-text text-muted"><i class="fas fa-globe me-2"></i>{{ dest.country }}</p>
-            <p class="card-text"><i class="fas fa-users me-2"></i>Pop: {{ dest.population | number }}</p>
+        <div class="card h-100 shadow-sm border-0">
+          <div class="position-relative">
+            <img [src]="dest.imageUrl || defaultFallbackImage" (error)="onImgError($event)" class="card-img-top rounded-top" [alt]="dest.name" style="height: 220px; object-fit: cover;">
+            <button 
+              type="button" 
+              class="btn btn-sm position-absolute top-0 start-0 m-2 rounded-circle shadow-sm"
+              [class.btn-danger]="isFavorite(dest)"
+              [class.btn-light]="!isFavorite(dest)"
+              (click)="toggleFavorite(dest, $event)"
+              [title]="isFavorite(dest) ? 'Quitar de Favoritos' : 'Agregar a Favoritos'">
+              <i [class]="isFavorite(dest) ? 'fas fa-heart text-white' : 'far fa-heart text-danger'"></i>
+            </button>
+            <span *ngIf="dest.imageUrl" class="badge bg-dark bg-opacity-75 position-absolute top-0 end-0 m-2">
+              <i class="fas fa-camera me-1"></i> Foto Real
+            </span>
           </div>
-          <div class="card-footer bg-white border-0 text-center pb-3">
-            <button class="btn btn-outline-success w-100" (click)="saveDestination(dest)">
-              <i class="fas fa-plus-circle me-1"></i> Guardar Destino Local
+          <div class="card-body">
+            <h5 class="card-title fw-bold text-dark mb-1">{{ dest.name }}</h5>
+            <p class="card-text text-muted mb-2"><i class="fas fa-map-marker-alt text-danger me-2"></i>{{ dest.country }}</p>
+            <div class="d-flex justify-content-between text-secondary small">
+              <span><i class="fas fa-users me-1"></i>{{ (dest.population || 0) | number }} hab.</span>
+              <span><i class="fas fa-compass me-1"></i>{{ dest.latitude | number:'1.2-2' }}, {{ dest.longitude | number:'1.2-2' }}</span>
+            </div>
+          </div>
+          <div class="card-footer bg-white border-0 pb-3 d-grid gap-2">
+            <button class="btn btn-primary" (click)="exploreDestination(dest)">
+              <i class="fas fa-compass me-1"></i> Ver Destino
+            </button>
+            <button class="btn btn-outline-success btn-sm" (click)="saveDestination(dest)">
+              <i class="fas fa-bookmark me-1"></i> + Guardar en Mis Destinos
             </button>
           </div>
         </div>
@@ -45,26 +106,37 @@
 
   <!-- Destinos Populares Locales -->
   <div>
-    <h3 class="mb-3 border-bottom pb-2">Destinos Guardados (Populares)</h3>
+    <h3 class="mb-3 border-bottom pb-2">Destinos Destacados de la Comunidad</h3>
     <div class="row row-cols-1 row-cols-md-3 g-4">
       <div class="col" *ngFor="let pop of popularDestinations">
         <div class="card h-100 shadow-sm border-0 bg-light">
-          <img [src]="pop.imageUrl" class="card-img-top rounded-top" alt="City" style="height: 200px; object-fit: cover;">
+          <div class="position-relative">
+            <img [src]="pop.imageUrl || defaultFallbackImage" (error)="onImgError($event)" class="card-img-top rounded-top" [alt]="pop.name" style="height: 200px; object-fit: cover;">
+            <button 
+              type="button" 
+              class="btn btn-sm position-absolute top-0 start-0 m-2 rounded-circle shadow-sm"
+              [class.btn-danger]="isFavorite(pop)"
+              [class.btn-light]="!isFavorite(pop)"
+              (click)="toggleFavorite(pop, $event)"
+              [title]="isFavorite(pop) ? 'Quitar de Favoritos' : 'Agregar a Favoritos'">
+              <i [class]="isFavorite(pop) ? 'fas fa-heart text-white' : 'far fa-heart text-danger'"></i>
+            </button>
+          </div>
           <div class="card-body">
-            <h5 class="card-title fw-bold">{{ pop.name }}</h5>
-            <p class="card-text text-muted mb-1">{{ pop.country }}</p>
-            <p class="card-text small">Rating Promedio: ⭐ 4.5</p>
+            <h5 class="card-title fw-bold text-primary">{{ pop.name }}</h5>
+            <p class="card-text text-muted mb-1"><i class="fas fa-globe me-1"></i>{{ pop.country }}</p>
+            <p class="card-text small text-secondary fw-semibold">{{ getDestinationRating(pop.id) }}</p>
           </div>
           <div class="card-footer bg-light border-0 pt-0">
             <a [routerLink]="['/tourism/destination', pop.id]" class="btn btn-primary w-100">
-              Ver Reseñas & Experiencias
+              <i class="fas fa-comments me-1"></i> Ver Reseñas & Experiencias
             </a>
           </div>
         </div>
       </div>
       <div class="col-12" *ngIf="popularDestinations.length === 0">
-        <div class="alert alert-info text-center">
-          No hay destinos guardados todavía. Usa el buscador de arriba.
+        <div class="alert alert-info text-center shadow-sm">
+          <i class="fas fa-info-circle me-2"></i> Aún no hay destinos guardados en la plataforma. Explora el buscador y agrega tus lugares favoritos.
         </div>
       </div>
     </div>

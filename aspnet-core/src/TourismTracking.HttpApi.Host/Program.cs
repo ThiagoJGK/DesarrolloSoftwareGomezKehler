@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,13 +12,26 @@ public class Program
 {
     public async static Task<int> Main(string[] args)
     {
-        Log.Logger = new LoggerConfiguration()
+        bool isLightweight = args != null && (Array.Exists(args, a => a.Equals("--lightweight", StringComparison.OrdinalIgnoreCase)) || Environment.GetEnvironmentVariable("LIGHTWEIGHT_MODE") == "true");
+
+        var logConfig = new LoggerConfiguration();
+        if (isLightweight)
+        {
+            logConfig.MinimumLevel.Warning()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Volo.Abp", LogEventLevel.Warning);
+        }
+        else
+        {
 #if DEBUG
-            .MinimumLevel.Debug()
+            logConfig.MinimumLevel.Debug();
 #else
-            .MinimumLevel.Information()
+            logConfig.MinimumLevel.Information();
 #endif
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            logConfig.MinimumLevel.Override("Microsoft", LogEventLevel.Information);
+        }
+
+        Log.Logger = logConfig
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
             .Enrich.FromLogContext()
             .WriteTo.Async(c => c.File("Logs/logs.txt"))
@@ -27,7 +40,7 @@ public class Program
 
         try
         {
-            Log.Information("Starting TourismTracking.HttpApi.Host.");
+            Log.Information(isLightweight ? "Starting TourismTracking.HttpApi.Host (LIGHTWEIGHT MODE)." : "Starting TourismTracking.HttpApi.Host.");
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
@@ -35,6 +48,15 @@ public class Program
             await builder.AddApplicationAsync<TourismTrackingHttpApiHostModule>();
             var app = builder.Build();
             await app.InitializeApplicationAsync();
+
+            if (isLightweight)
+            {
+                // Liberar memoria transitoria de inicialización
+                GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+                GC.WaitForPendingFinalizers();
+                GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+            }
+
             await app.RunAsync();
             return 0;
         }
