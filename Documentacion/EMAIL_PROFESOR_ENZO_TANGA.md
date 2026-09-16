@@ -22,11 +22,11 @@ Te comparto los enlaces y la información de acceso para que puedas revisarlo cu
 * **Informe Técnico & Matriz de Requerimientos:** Se encuentra documentado en detalle dentro del archivo [`Documentacion/REVISION_PREVIA_ACADEMICA.md`](https://github.com/ThiagoJGK/DesarrolloSoftwareGomezKehler/blob/dev/Documentacion/REVISION_PREVIA_ACADEMICA.md) en el repositorio.
 
 #### 🔑 Credenciales para la navegación interactiva:
-* **Usuario de prueba sugerido:** `ThiagoJGK` | **Contraseña:** `Thiago123*`  
+* **Usuario de prueba sugerido:** `ThiagoJGK` | **Contraseña:** Configurada vía User Secrets (ver `README.md`)  
   *(Cuenta recomendada: ya cuenta con tablero precargado de destinos favoritos, bitácoras personales editables y bandeja de notificaciones en tiempo real).*
-* **Usuario Administrador:** `admin` | **Contraseña:** `1q2w3E*`  
+* **Usuario Administrador:** `admin` | **Contraseña:** Configurada vía User Secrets / Inicialización ABP (ver `README.md`)  
   *(Para consultar métricas de consumo de API externa y Swagger UI).*
-* **Usuarios de la comunidad:** `lucas.aventura`, `sofia.viajera`, `elena.patagonia` | **Contraseña:** `Comunidad2024*`  
+* **Usuarios de la comunidad:** `lucas.aventura`, `sofia.viajera`, `elena.patagonia` | **Contraseña:** Configurada vía User Secrets (ver `README.md`)  
   *(Para evaluar la navegación de opiniones y perfiles públicos de otros viajeros).*
 
 #### 🛠️ Resumen de lo implementado:

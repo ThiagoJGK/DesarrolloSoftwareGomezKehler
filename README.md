@@ -123,15 +123,45 @@ npm start
 
 ---
 
-## 🔑 Credenciales de Acceso Demo
+## 🔐 Seguridad y Gestión de Credenciales (User Secrets)
 
-Para la evaluación académica de la cátedra, se han configurado las siguientes credenciales predeterminadas:
+En cumplimiento de las buenas prácticas de seguridad y las directivas académicas de la cátedra, **no se almacenan contraseñas ni claves de API privadas en los repositorios públicos de Git**.
 
-| Campo | Valor |
-| :--- | :--- |
-| **Usuario** | `admin` |
-| **Contraseña** | `1q2w3E*` |
-| **Rol** | Administrador del Sistema / Viajero Principal |
+Las contraseñas de las cuentas de prueba sembradas en la base de datos y la API Key de TicketMaster se gestionan mediante el almacén seguro de **.NET User Secrets** en desarrollo local o mediante **variables de entorno** en entornos de integración continua / producción.
+
+### ⚙️ Configuración Rápida en Desarrollo Local:
+
+Ejecutar los siguientes comandos en PowerShell o Terminal para definir las credenciales locales en el almacén de usuario del sistema operativo:
+
+```powershell
+# Definir contraseña para el usuario activo principal (ThiagoJGK)
+dotnet user-secrets set "SeedPasswords:Thiago" "TuPasswordSegura1*" --project aspnet-core/src/TourismTracking.HttpApi.Host
+
+# Definir contraseña para los usuarios de la comunidad (@lucas.aventura, @sofia.viajera, etc.)
+dotnet user-secrets set "SeedPasswords:Community" "TuPasswordComunidad1*" --project aspnet-core/src/TourismTracking.HttpApi.Host
+
+# Definir la API Key de TicketMaster (Discovery API v2)
+dotnet user-secrets set "TicketMaster:ApiKey" "TuApiKeyTicketMaster" --project aspnet-core/src/TourismTracking.HttpApi.Host
+```
+
+> **Nota:** `TourismTracking.DbMigrator` comparte el mismo `UserSecretsId` (`TourismTracking-4681b4fd-151f-4221-84a4-929d86723e4c`), por lo que al ejecutar la migración y el sembrado de datos leerá automáticamente estas mismas claves.
+
+### 🌐 Equivalencia en Variables de Entorno (CI/CD o Docker):
+| Clave de Configuración | Variable de Entorno | Propósito |
+| :--- | :--- | :--- |
+| `SeedPasswords:Thiago` | `SeedPasswords__Thiago` | Contraseña para la cuenta activa demo `ThiagoJGK` |
+| `SeedPasswords:Community` | `SeedPasswords__Community` | Contraseña para cuentas de la comunidad |
+| `TicketMaster:ApiKey` | `TicketMaster__ApiKey` | Clave de acceso a la API externa de TicketMaster |
+
+### 👥 Cuentas de Demostración Sembradas en Base de Datos:
+| Usuario | Nombre Completo | Propósito en la Evaluación | Contraseña |
+| :--- | :--- | :--- | :--- |
+| `ThiagoJGK` | Thiago Gómez Kehler | **Usuario Principal:** tablero precargado de favoritos, bitácoras editables y notificaciones | Configurada vía User Secrets (`SeedPasswords:Thiago`) |
+| `admin` | Administrador WanderTrack | **Administración:** gestión de permisos ABP, roles y Swagger UI | Configurada vía inicialización ABP / User Secrets |
+| `lucas.aventura` | Lucas Benítez | Viajero de comunidad: alta montaña y trekking | Configurada vía User Secrets (`SeedPasswords:Community`) |
+| `sofia.viajera` | Sofía Martínez | Viajera de comunidad: fotografía y patrimonio histórico | Configurada vía User Secrets (`SeedPasswords:Community`) |
+| `elena.patagonia` | Elena Rossi | Viajera de comunidad: enoturismo y gastronomía | Configurada vía User Secrets (`SeedPasswords:Community`) |
+| `martin.turismo` | Martín Albarracín | Viajero de comunidad: ecoturismo y circuitos culturales | Configurada vía User Secrets (`SeedPasswords:Community`) |
 
 ---
 

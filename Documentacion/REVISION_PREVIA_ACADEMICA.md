@@ -187,7 +187,7 @@ Se ejecutó de forma consecutiva la herramienta `TourismTracking.DbMigrator` en 
 * **Erradicación Total de GUIDs Crudos:** Se reemplazaron todas las referencias visuales de identificadores de usuario (ej. `Usuario a00f69da...` o `ID: a00f69da`) por la resolución asíncrona de nombres y avatares a través de `EnrichReviewsWithAuthorAsync` y `EnrichExperiencesWithAuthorAsync`.
 
 ### 🔹 Hito R4: Erradicación de Carteles de "Modo Académico / Evaluación"
-* **Saneamiento Visual Integral:** Se eliminaron todos los banners, avisos de credenciales demo (`admin` / `1q2w3E*`) y textos de *"Modo Evaluación Activo"* en `home.component.html` y `user-dashboard.component.html`.
+* **Saneamiento Visual Integral:** Se eliminaron todos los banners, avisos de credenciales demo (`admin`) y textos de *"Modo Evaluación Activo"* en `home.component.html` y `user-dashboard.component.html`.
 * **Identidad de Marca WanderTrack:** Se estandarizó la paleta cromática sobria, la barra lateral colapsable con expansión suave al hover y la iconografía turística profesional.
 
 ### 🔹 Hito R5: Notificaciones en Vivo y Disparador Interactivo en "Mi Tablero"
@@ -199,12 +199,12 @@ Se ejecutó de forma consecutiva la herramienta `TourismTracking.DbMigrator` en 
 
 ## 🔑 6. Credenciales de Evaluación y Datos de Prueba
 
-Para facilitar la evaluación interactiva de la plataforma por parte de la cátedra, se detallan los perfiles configurados en la base de datos relacional:
+Para facilitar la evaluación interactiva de la plataforma por parte de la cátedra, se detallan los perfiles configurados en la base de datos relacional (todas las contraseñas se configuran de forma segura vía **User Secrets** o variables de entorno, siguiendo las instrucciones de `README.md`):
 
 ### A. Usuario Activo Principal (Recomendado para evaluación integral de UX)
 * **Nombre:** Thiago Gómez Kehler
 * **Usuario:** `ThiagoJGK`
-* **Contraseña:** `Thiago123*`
+* **Contraseña:** Configurada vía User Secrets (ver `README.md`)
 * **Contenido asignado de entrada:**
   * 4 Destinos en Favoritos (Mendoza, Bariloche, Ushuaia, Iguazú).
   * 3 Bitácoras/Crónicas de viaje propias (listas para probar edición y eliminación).
@@ -213,14 +213,14 @@ Para facilitar la evaluación interactiva de la plataforma por parte de la cáte
 ### B. Usuario Administrador del Sistema
 * **Nombre:** Administrador WanderTrack
 * **Usuario:** `admin`
-* **Contraseña:** `1q2w3E*`
+* **Contraseña:** Configurada vía User Secrets / Inicialización ABP (ver `README.md`)
 * **Rol:** Acceso completo a módulos administrativos de ABP Framework y Swagger API.
 
 ### C. Usuarios de la Comunidad (Para evaluar perfiles públicos y autoría)
-* `@lucas.aventura` — Lucas Benítez (Contraseña: `Comunidad2024*`)
-* `@sofia.viajera` — Sofía Martínez (Contraseña: `Comunidad2024*`)
-* `@elena.patagonia` — Elena Rossi (Contraseña: `Comunidad2024*`)
-* `@martin.turismo` — Martín Albarracín (Contraseña: `Comunidad2024*`)
+* `@lucas.aventura` — Lucas Benítez (Contraseña: Configurada vía User Secrets, ver `README.md`)
+* `@sofia.viajera` — Sofía Martínez (Contraseña: Configurada vía User Secrets, ver `README.md`)
+* `@elena.patagonia` — Elena Rossi (Contraseña: Configurada vía User Secrets, ver `README.md`)
+* `@martin.turismo` — Martín Albarracín (Contraseña: Configurada vía User Secrets, ver `README.md`)
 
 ---
 
@@ -244,11 +244,11 @@ Te comparto los enlaces y la información de acceso para que puedas revisarlo cu
 * Informe Técnico & Matriz de Requerimientos: Se encuentra documentado en detalle dentro del archivo Documentacion/REVISION_PREVIA_ACADEMICA.md en el repositorio.
 
 Credenciales para la navegación interactiva:
-- Usuario de prueba sugerido: ThiagoJGK | Contraseña: Thiago123*
+- Usuario de prueba sugerido: ThiagoJGK | Contraseña: Configurada vía User Secrets (ver README.md)
   (Cuenta recomendada: ya cuenta con tablero precargado de destinos favoritos, bitácoras personales editables y bandeja de notificaciones en tiempo real).
-- Usuario Administrador: admin | Contraseña: 1q2w3E*
+- Usuario Administrador: admin | Contraseña: Configurada vía User Secrets / Inicialización ABP (ver README.md)
   (Para consultar métricas de consumo de API externa y Swagger UI).
-- Usuarios de la comunidad: lucas.aventura, sofia.viajera, elena.patagonia | Contraseña: Comunidad2024*
+- Usuarios de la comunidad: lucas.aventura, sofia.viajera, elena.patagonia | Contraseña: Configurada vía User Secrets (ver README.md)
   (Para evaluar la navegación de opiniones y perfiles públicos de otros viajeros).
 
 Resumen de lo implementado:

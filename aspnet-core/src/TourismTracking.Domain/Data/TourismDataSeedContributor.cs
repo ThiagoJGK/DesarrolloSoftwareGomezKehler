@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using TourismTracking.Destinations;
 using TourismTracking.Experiences;
 using TourismTracking.Notifications;
@@ -24,6 +25,7 @@ namespace TourismTracking.Data
         private readonly IRepository<IdentityUser, Guid> _userRepository;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IdentityUserManager _identityUserManager;
+        private readonly IConfiguration _configuration;
 
         public TourismDataSeedContributor(
             IRepository<Destination, Guid> destinationRepository,
@@ -33,7 +35,8 @@ namespace TourismTracking.Data
             IRepository<Notification, Guid> notificationRepository,
             IRepository<IdentityUser, Guid> userRepository,
             IGuidGenerator guidGenerator,
-            IdentityUserManager identityUserManager)
+            IdentityUserManager identityUserManager,
+            IConfiguration configuration)
         {
             _destinationRepository = destinationRepository;
             _reviewRepository = reviewRepository;
@@ -43,19 +46,23 @@ namespace TourismTracking.Data
             _userRepository = userRepository;
             _guidGenerator = guidGenerator;
             _identityUserManager = identityUserManager;
+            _configuration = configuration;
         }
 
         [UnitOfWork]
         public virtual async Task SeedAsync(DataSeedContext context)
         {
             // 1. Seed / Ensure Community Users and Active User (ThiagoJGK)
+            var communityPassword = _configuration["SeedPasswords:Community"];
+            var thiagoPassword = _configuration["SeedPasswords:Thiago"];
+
             var lucasUser = await EnsureUserAsync(
                 context,
                 "lucas.aventura",
                 "Lucas",
                 "Benítez",
                 "lucas.aventura@wander-track.com",
-                "Comunidad2024*",
+                communityPassword,
                 "https://api.dicebear.com/7.x/avataaars/svg?seed=lucas.aventura",
                 "Amante del trekking, escalada y naturaleza"
             );
@@ -66,7 +73,7 @@ namespace TourismTracking.Data
                 "Sofía",
                 "Martínez",
                 "sofia.viajera@wander-track.com",
-                "Comunidad2024*",
+                communityPassword,
                 "https://api.dicebear.com/7.x/avataaars/svg?seed=sofia.viajera",
                 "Fotografía de viajes y turismo histórico"
             );
@@ -77,7 +84,7 @@ namespace TourismTracking.Data
                 "Elena",
                 "Rossi",
                 "elena.patagonia@wander-track.com",
-                "Comunidad2024*",
+                communityPassword,
                 "https://api.dicebear.com/7.x/avataaars/svg?seed=elena.patagonia",
                 "Rutas gastronómicas y enoturismo regional"
             );
@@ -88,7 +95,7 @@ namespace TourismTracking.Data
                 "Martín",
                 "Albarracín",
                 "martin.turismo@wander-track.com",
-                "Comunidad2024*",
+                communityPassword,
                 "https://api.dicebear.com/7.x/avataaars/svg?seed=martin.turismo",
                 "Ecoturismo y circuitos culturales"
             );
@@ -99,7 +106,7 @@ namespace TourismTracking.Data
                 "Thiago",
                 "Gómez Kehler",
                 "thiagojgk@wander-track.com",
-                "Thiago123*",
+                thiagoPassword,
                 "https://api.dicebear.com/7.x/avataaars/svg?seed=ThiagoJGK",
                 "Aventuras al aire libre, fotografía paisajística y senderismo de alta montaña"
             );
@@ -478,7 +485,7 @@ namespace TourismTracking.Data
             string name,
             string surname,
             string email,
-            string password,
+            string? password,
             string avatarUrl,
             string preferences)
         {
@@ -492,7 +499,12 @@ namespace TourismTracking.Data
                 };
                 user.SetProperty("Photo", avatarUrl);
                 user.SetProperty("Preferences", preferences);
-                var result = await _identityUserManager.CreateAsync(user, password);
+
+                var effectivePassword = !string.IsNullOrWhiteSpace(password)
+                    ? password
+                    : $"Secured_{_guidGenerator.Create():N}!Aa1";
+
+                var result = await _identityUserManager.CreateAsync(user, effectivePassword);
                 if (!result.Succeeded)
                 {
                     user = await _identityUserManager.FindByEmailAsync(email)
@@ -501,9 +513,15 @@ namespace TourismTracking.Data
             }
             else
             {
-                // Ensure password matches the required seed password
-                await _identityUserManager.RemovePasswordAsync(user);
-                await _identityUserManager.AddPasswordAsync(user, password);
+                if (!string.IsNullOrWhiteSpace(password))
+                {
+                    var hasPassword = await _identityUserManager.HasPasswordAsync(user);
+                    if (hasPassword)
+                    {
+                        await _identityUserManager.RemovePasswordAsync(user);
+                    }
+                    await _identityUserManager.AddPasswordAsync(user, password);
+                }
 
                 bool modified = false;
                 if (string.IsNullOrWhiteSpace(user.Name) || user.Name != name)
