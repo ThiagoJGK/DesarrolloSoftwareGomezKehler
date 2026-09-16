@@ -37,6 +37,11 @@ extract_pdfs.py
 *.log
 temp.log
 
+# Documentación interna y personal (no subir al repositorio)
+Documentacion/
+docs/
+PROJECT.md
+
 # Agent Metadata & Scratch
 .agents/
 scratch/

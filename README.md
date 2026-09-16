@@ -3,7 +3,7 @@
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![ABP Framework](https://img.shields.io/badge/ABP%20Framework-v8.3.4-blue)](https://abp.io/)
 [![Angular](https://img.shields.io/badge/Angular-18-DD0031?logo=angular)](https://angular.dev/)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-55%2F55%20Passed-success)]()
+[![Tests](https://img.shields.io/badge/Unit%20Tests-73%2F73%20Passed-success)]()
 [![UTN FRCU](https://img.shields.io/badge/UTN-FRCU%202025-006699)](https://www.frcu.utn.edu.ar/)
 
 > **Trabajo Práctico de Cátedra — Desarrollo de Software (Año 2025)**  
@@ -167,7 +167,7 @@ dotnet user-secrets set "TicketMaster:ApiKey" "TuApiKeyTicketMaster" --project a
 
 ## 🧪 Verificación Automatizada (Suite de Pruebas Unitarias)
 
-La solución cuenta con **55 pruebas unitarias e integración** que certifican el cumplimiento de las reglas de negocio en la capa de dominio y de aplicación:
+La solución cuenta con **73 pruebas unitarias e integración** que certifican el cumplimiento de las reglas de negocio en la capa de dominio y de aplicación (incluyendo pruebas con simulación de eventos de TicketMaster):
 
 ```powershell
 dotnet test aspnet-core/TourismTracking.sln
@@ -175,22 +175,11 @@ dotnet test aspnet-core/TourismTracking.sln
 
 ### Resumen de Resultados de Pruebas:
 ```
-Total tests: 55
-     Passed: 55
+Total tests: 73
+     Passed: 73
      Failed: 0
     Skipped: 0
-Total time: ~3.8 Segundos
 ```
 * `TourismTracking.Domain.Tests`: 28 pruebas unitarias aprobadas.
-* `TourismTracking.Application.Tests`: 19 pruebas de servicios aprobadas.
-* `TourismTracking.EntityFrameworkCore.Tests`: 8 pruebas de persistencia aprobadas.
-
----
-
-## 📚 Enlaces al Centro de Documentación
- 
-* [Condiciones de Aprobación de Cátedra](./Documentacion/Condiciones_Aprobacion_2025.md)
-* [Matriz de Operaciones del Sistema (Checklist)](./Documentacion/Operaciones_Sistema_v1.0.md)
-* [Justificación Arquitectónica y Data Flow](./Documentacion/Justificacion_Arquitectonica.md)
-* [Modelos del Dominio y Diagramas UML](./Documentacion/diagramas_uml.md)
-* [Informe Técnico de Estado Avanzado para Revisión](./Documentacion/REVISION_PREVIA_ACADEMICA.md)
+* `TourismTracking.Application.Tests`: 37 pruebas de servicios, métricas y worker en segundo plano aprobadas.
+* `TourismTracking.EntityFrameworkCore.Tests`: 8 pruebas de persistencia y relaciones relacionales aprobadas.
