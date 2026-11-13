@@ -18,7 +18,7 @@ if ($code -ne 0) {
     exit 1
 }
 
-if ($output -notmatch 'RESTORE_AND_BUILD_SUCCESS') {
+if (($output -join "`n") -notmatch 'RESTORE_AND_BUILD_SUCCESS') {
     Write-Error "Fallo: El script no emitio la cadena de exito canocica 'RESTORE_AND_BUILD_SUCCESS'"
     exit 1
 }
