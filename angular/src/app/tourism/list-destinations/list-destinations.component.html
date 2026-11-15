@@ -40,8 +40,8 @@
                   <label class="form-label small mb-1">Población Mínima</label>
                   <input type="number" class="form-control form-control-sm bg-secondary text-white border-0" placeholder="Ej. 50000" [(ngModel)]="minPopulationFilter">
                 </div>
-                <div class="col-md-2 d-flex gap-1">
-                  <button class="btn btn-outline-warning btn-sm w-100" type="button" (click)="clearFilters()" [disabled]="!hasActiveFilters" title="Restablecer filtros">
+                <div class="col-12 col-md-2 d-flex gap-1">
+                  <button class="btn btn-outline-warning btn-sm w-100 d-inline-flex align-items-center justify-content-center text-nowrap" type="button" (click)="clearFilters()" [disabled]="!hasActiveFilters" title="Restablecer filtros">
                     <i class="fas fa-undo me-1"></i> Limpiar
                   </button>
                 </div>

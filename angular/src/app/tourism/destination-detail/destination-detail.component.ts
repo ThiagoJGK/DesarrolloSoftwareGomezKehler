@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { DestinationService } from '../../proxy/destinations/destination.service';
 import { DestinationDto } from '../../proxy/destinations/models';
 import { TourismInteractionService } from '../../proxy/experiences/tourism-interaction.service';
@@ -14,13 +14,15 @@ import { ToasterService, ConfirmationService, Confirmation } from '@abp/ng.theme
 @Component({
   selector: 'app-destination-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './destination-detail.component.html',
   styleUrl: './destination-detail.component.scss'
 })
 export class DestinationDetailComponent implements OnInit {
   destinationId: string = '';
   destination: DestinationDto | undefined;
+  loading = true;
+  notFound = false;
   metrics: DestinationMetricsDto | undefined;
   reviews: ReviewDto[] = [];
   experiences: ExperienceDto[] = [];
@@ -61,12 +63,16 @@ export class DestinationDetailComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       this.destinationId = params.get('id') || '';
       if (this.isValidGuid(this.destinationId)) {
+        this.loading = true;
+        this.notFound = false;
         this.loadDestinationDetails();
         this.loadMetricsAndReviews();
         this.loadExperiences();
         this.checkIfFavorite();
       } else {
         this.destination = undefined;
+        this.loading = false;
+        this.notFound = true;
       }
     });
   }
@@ -80,8 +86,17 @@ export class DestinationDetailComponent implements OnInit {
   }
 
   loadDestinationDetails() {
-    this.destinationService.getSavedDestinations().subscribe(res => {
-      this.destination = res.find(d => d.id === this.destinationId);
+    this.destinationService.getSavedDestinations().subscribe({
+      next: res => {
+        this.destination = res.find(d => d.id === this.destinationId);
+        this.notFound = !this.destination;
+        this.loading = false;
+      },
+      error: () => {
+        this.destination = undefined;
+        this.notFound = true;
+        this.loading = false;
+      }
     });
   }
 
