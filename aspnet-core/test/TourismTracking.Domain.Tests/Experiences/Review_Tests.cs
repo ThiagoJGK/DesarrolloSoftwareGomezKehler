@@ -64,5 +64,43 @@ namespace TourismTracking.Domain.Tests.Experiences
             review.DestinationId.ShouldBe(destId);
             review.UserId.ShouldBe(userId);
         }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData(null)]
+        public void Should_Throw_For_Empty_Or_Null_Comment(string invalidComment)
+        {
+            Assert.Throws<ArgumentException>(() =>
+                new Review(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 4, invalidComment)
+            );
+        }
+
+        [Fact]
+        public void Should_Throw_When_Comment_Exceeds_MaxLength()
+        {
+            var tooLong = new string('a', Review.MaxCommentLength + 1);
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                new Review(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 4, tooLong)
+            );
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData(null)]
+        public void UpdateReview_Should_Throw_For_Empty_Or_Null_Comment(string invalidComment)
+        {
+            var review = new Review(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 4, "Valid");
+            Assert.Throws<ArgumentException>(() => review.UpdateReview(4, invalidComment));
+        }
+
+        [Fact]
+        public void UpdateReview_Should_Throw_When_Comment_Exceeds_MaxLength()
+        {
+            var review = new Review(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 4, "Valid");
+            var tooLong = new string('a', Review.MaxCommentLength + 1);
+            Assert.Throws<ArgumentOutOfRangeException>(() => review.UpdateReview(4, tooLong));
+        }
     }
 }

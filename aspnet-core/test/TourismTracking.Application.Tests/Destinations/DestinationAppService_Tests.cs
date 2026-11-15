@@ -1,9 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using NSubstitute;
 using Shouldly;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Guids;
 using Xunit;
 using TourismTracking.Destinations;
 using TourismTracking.Experiences;
@@ -36,8 +42,11 @@ namespace TourismTracking.Application.Tests.Destinations
             var serviceProvider = Substitute.For<IServiceProvider>();
             
             var objectMapper = new SimpleTestObjectMapper();
+            var guidGenerator = Substitute.For<IGuidGenerator>();
+            guidGenerator.Create().Returns(_ => Guid.NewGuid());
 
             serviceProvider.GetService(typeof(IObjectMapper)).Returns(objectMapper);
+            serviceProvider.GetService(typeof(IGuidGenerator)).Returns(guidGenerator);
 
             var lazyServiceProvider = new AbpLazyServiceProvider(serviceProvider);
 
@@ -88,6 +97,64 @@ namespace TourismTracking.Application.Tests.Destinations
             await _experienceRepository.Received(1).DeleteAsync(Arg.Any<System.Linq.Expressions.Expression<Func<Experience, bool>>>());
             await _reviewRepository.Received(1).DeleteAsync(Arg.Any<System.Linq.Expressions.Expression<Func<Review, bool>>>());
             await _destinationRepository.Received(1).DeleteAsync(destinationId);
+        }
+
+        [Fact]
+        public void DeleteSavedDestinationAsync_Should_Require_Admin_Role()
+        {
+            var method = typeof(DestinationAppService).GetMethod(nameof(DestinationAppService.DeleteSavedDestinationAsync));
+            method.ShouldNotBeNull();
+
+            var authorizeAttr = method.GetCustomAttribute<AuthorizeAttribute>();
+            authorizeAttr.ShouldNotBeNull();
+            authorizeAttr.Roles.ShouldBe("admin");
+        }
+
+        [Fact]
+        public async Task SaveDestinationToInternalDbAsync_Should_Serialize_Concurrent_Calls_Without_Duplicates()
+        {
+            var stored = new List<Destination>();
+
+            _destinationRepository
+                .FirstOrDefaultAsync(Arg.Any<Expression<Func<Destination, bool>>>(), Arg.Any<CancellationToken>())
+                .Returns(async callInfo =>
+                {
+                    await Task.Delay(15);
+                    var predicate = callInfo.Arg<Expression<Func<Destination, bool>>>().Compile();
+                    return stored.FirstOrDefault(predicate);
+                });
+
+            _destinationRepository
+                .InsertAsync(Arg.Any<Destination>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+                .Returns(callInfo =>
+                {
+                    var entity = callInfo.Arg<Destination>();
+                    stored.Add(entity);
+                    return Task.FromResult(entity);
+                });
+
+            _destinationRepository
+                .UpdateAsync(Arg.Any<Destination>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+                .Returns(callInfo => Task.FromResult(callInfo.Arg<Destination>()));
+
+            var tasks = Enumerable.Range(0, 5).Select(_ => _appService.SaveDestinationToInternalDbAsync(new SaveDestinationInput
+            {
+                Name = "  Mendoza  ",
+                Country = "  Argentina  ",
+                Population = 120000,
+                Latitude = -32.8894,
+                Longitude = -68.8458,
+                ImageUrl = "https://example.com/mendoza.jpg"
+            }));
+
+            var results = await Task.WhenAll(tasks);
+
+            results.Length.ShouldBe(5);
+            stored.Count.ShouldBe(1);
+            stored[0].Name.ShouldBe("Mendoza");
+            stored[0].Country.ShouldBe("Argentina");
+            await _destinationRepository.Received(1).InsertAsync(Arg.Any<Destination>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+            await _destinationRepository.Received(4).UpdateAsync(Arg.Any<Destination>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
         }
     }
 }

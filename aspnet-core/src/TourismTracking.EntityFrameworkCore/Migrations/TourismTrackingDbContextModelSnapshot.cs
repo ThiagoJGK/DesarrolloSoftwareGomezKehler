@@ -38,7 +38,8 @@ namespace TourismTracking.Migrations
 
                     b.Property<string>("Country")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2")
@@ -90,12 +91,15 @@ namespace TourismTracking.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<long>("Population")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name", "Country");
 
                     b.ToTable("AppDestinations", (string)null);
                 });
@@ -190,6 +194,9 @@ namespace TourismTracking.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId", "DestinationId")
+                        .IsUnique();
 
                     b.ToTable("AppFavorites", (string)null);
                 });

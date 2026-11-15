@@ -374,5 +374,67 @@ namespace TourismTracking.Application.Tests.Workers
             var eventsBlankCity = await service.GetEventsByCityAsync("  ");
             eventsBlankCity.ShouldBeEmpty();
         }
+
+        [Fact]
+        public async Task StressTest_SecondRun_DoesNotInsertDuplicateNotification_WhenAlreadyExists()
+        {
+            var destId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
+            var dest = new Destination(destId, "Cordoba", "Argentina", 150000, -31.42, -64.18, "img", DateTime.UtcNow);
+
+            var favorites = new List<FavoriteListItem>
+            {
+                new(Guid.NewGuid(), destId, userId)
+            };
+
+            _favRepo.GetListAsync(cancellationToken: Arg.Any<CancellationToken>()).Returns(Task.FromResult(favorites));
+            _destRepo.FindAsync(destId, cancellationToken: Arg.Any<CancellationToken>()).Returns(Task.FromResult<Destination?>(dest));
+            _ticketmasterService.GetEventsByCityAsync("Cordoba", Arg.Any<CancellationToken>()).Returns(Task.FromResult(new List<TicketmasterEventDto>
+            {
+                new() { Name = "Cosquin Rock", FormattedDate = "15-02-2026" }
+            }));
+
+            // First run: notification does not exist yet
+            _notifRepo.AnyAsync(
+                Arg.Any<System.Linq.Expressions.Expression<Func<Notification, bool>>>(),
+                cancellationToken: Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult(false));
+
+            await _worker.ProcessDestinationUpdatesAsync(_serviceProvider);
+
+            // Second run: notification already exists
+            _notifRepo.AnyAsync(
+                Arg.Any<System.Linq.Expressions.Expression<Func<Notification, bool>>>(),
+                cancellationToken: Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult(true));
+
+            await _worker.ProcessDestinationUpdatesAsync(_serviceProvider);
+
+            // Assert: Inserted only once across both runs
+            await _notifRepo.Received(1).InsertAsync(Arg.Any<Notification>(), cancellationToken: Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task StressTest_TicketmasterService_MalformedJson_ReturnsEmptyListWithoutThrowing()
+        {
+            var handler = new MockHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{invalid", Encoding.UTF8, "application/json")
+            });
+
+            var httpClient = new HttpClient(handler);
+            var factory = Substitute.For<IHttpClientFactory>();
+            factory.CreateClient(Arg.Any<string>()).Returns(httpClient);
+
+            var config = Substitute.For<IConfiguration>();
+            config["TicketMaster:ApiKey"].Returns("VALID_KEY");
+            var logger = Substitute.For<ILogger<TicketmasterService>>();
+
+            var service = new TicketmasterService(factory, config, logger);
+
+            var events = await service.GetEventsByCityAsync("Rosario");
+            events.ShouldNotBeNull();
+            events.ShouldBeEmpty();
+        }
     }
 }

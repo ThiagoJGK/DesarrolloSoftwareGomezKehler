@@ -36,6 +36,8 @@ namespace TourismTracking.Users
                 throw new UserFriendlyException("User not found.");
             }
 
+            await _userManager.UpdateSecurityStampAsync(user);
+
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
@@ -46,6 +48,11 @@ namespace TourismTracking.Users
         [AllowAnonymous]
         public async Task<PublicUserProfileDto> GetPublicProfileAsync(Guid userId)
         {
+            if (userId == Guid.Empty)
+            {
+                throw new UserFriendlyException("User not found.");
+            }
+
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
@@ -58,7 +65,6 @@ namespace TourismTracking.Users
                 UserName = user.UserName,
                 Name = user.Name,
                 Surname = user.Surname,
-                Email = user.Email,
                 Photo = user.GetProperty<string>("Photo"),
                 Preferences = user.GetProperty<string>("Preferences")
             };

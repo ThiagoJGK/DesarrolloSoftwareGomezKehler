@@ -105,6 +105,11 @@ namespace TourismTracking.Ticketmaster
 
                 return result;
             }
+            catch (System.Text.Json.JsonException jsonEx)
+            {
+                _logger.LogWarning(jsonEx, "Respuesta JSON malformada de Ticketmaster Discovery API para ciudad {City}", cityName);
+                return new List<TicketmasterEventDto>();
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Excepción al consultar Ticketmaster Discovery API para ciudad {City}", cityName);

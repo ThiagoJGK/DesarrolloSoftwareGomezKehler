@@ -251,5 +251,39 @@ namespace TourismTracking.Application.Tests.Experiences
             // Assert
             await _favoritesRepo.Received(1).InsertAsync(Arg.Any<FavoriteListItem>());
         }
+
+        [Fact]
+        public async Task AddToFavoritesAsync_ConcurrentCalls_Should_Insert_Only_Once()
+        {
+            // Arrange
+            var currentUserId = Guid.NewGuid();
+            var destinationId = Guid.NewGuid();
+            _currentUser.Id.Returns(currentUserId);
+
+            var alreadyExists = false;
+            _favoritesRepo.AnyAsync(Arg.Any<System.Linq.Expressions.Expression<Func<FavoriteListItem, bool>>>())
+                .Returns(async _ =>
+                {
+                    await Task.Delay(15);
+                    return alreadyExists;
+                });
+
+            _favoritesRepo.InsertAsync(Arg.Any<FavoriteListItem>())
+                .Returns(callInfo =>
+                {
+                    alreadyExists = true;
+                    return Task.FromResult(callInfo.Arg<FavoriteListItem>());
+                });
+
+            // Act
+            await Task.WhenAll(
+                _appService.AddToFavoritesAsync(destinationId),
+                _appService.AddToFavoritesAsync(destinationId),
+                _appService.AddToFavoritesAsync(destinationId)
+            );
+
+            // Assert
+            await _favoritesRepo.Received(1).InsertAsync(Arg.Any<FavoriteListItem>());
+        }
     }
 }

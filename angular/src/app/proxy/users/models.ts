@@ -4,7 +4,6 @@ export interface PublicUserProfileDto {
   userName?: string;
   name?: string;
   surname?: string;
-  email?: string;
   photo?: string;
   preferences?: string;
 }

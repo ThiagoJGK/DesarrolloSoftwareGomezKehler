@@ -117,14 +117,24 @@ namespace TourismTracking.Workers
                 var eventDate = !string.IsNullOrWhiteSpace(firstEvent.FormattedDate) ? firstEvent.FormattedDate : DateTime.UtcNow.ToString("dd-MM-yyyy");
 
                 // Generar notificación con datos reales a los usuarios que tienen este destino en favoritos
+                var title = $"Novedades en {destination.Name}";
+                var message = $"Se ha detectado un evento relevante: '{eventName}' el día {eventDate}.";
                 var affectedUsers = activeFavs.Where(f => f.DestinationId == destId).Select(f => f.UserId).Distinct().ToList();
                 foreach (var userId in affectedUsers)
                 {
+                    var alreadyExists = await notifRepo.AnyAsync(
+                        n => n.UserId == userId && n.Title == title && n.Message == message,
+                        cancellationToken: cancellationToken);
+                    if (alreadyExists)
+                    {
+                        continue;
+                    }
+
                     await notifRepo.InsertAsync(new Notification(
                         guidGenerator.Create(),
                         userId,
-                        $"Novedades en {destination.Name}",
-                        $"Se ha detectado un evento relevante: '{eventName}' el día {eventDate}."
+                        title,
+                        message
                     ), cancellationToken: cancellationToken);
 
                     logger.LogInformation("Notificación registrada para el usuario {UserId} sobre {DestinationName}.", userId, destination.Name);

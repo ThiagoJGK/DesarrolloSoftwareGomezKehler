@@ -22,6 +22,7 @@ namespace TourismTracking.Destinations
         private readonly IRepository<Experience, Guid> _experienceRepository;
         private readonly IRepository<FavoriteListItem, Guid> _favoritesRepository;
         private readonly IRepository<ApiMetric, Guid> _apiMetricRepository;
+        private static readonly System.Threading.SemaphoreSlim _saveDestinationLock = new(1, 1);
 
         public DestinationAppService(
             IRepository<Destination, Guid> destinationRepository, 
@@ -223,28 +224,44 @@ namespace TourismTracking.Destinations
         [AllowAnonymous]
         public async Task<DestinationDto> SaveDestinationToInternalDbAsync(SaveDestinationInput input)
         {
-            var existing = await _destinationRepository.FirstOrDefaultAsync(d => d.Name == input.Name && d.Country == input.Country);
-            if (existing != null)
+            if (input == null || string.IsNullOrWhiteSpace(input.Name) || string.IsNullOrWhiteSpace(input.Country))
             {
-                var imgToUpdate = !string.IsNullOrEmpty(input.ImageUrl) ? input.ImageUrl : existing.ImageUrl;
-                existing.UpdateDetails(input.Population, imgToUpdate);
-                await _destinationRepository.UpdateAsync(existing);
-                return ObjectMapper.Map<Destination, DestinationDto>(existing);
+                throw new ArgumentException("Destination name and country are required.");
             }
 
-            var dest = new Destination(
-                id: GuidGenerator.Create(),
-                name: input.Name,
-                country: input.Country,
-                population: input.Population,
-                lat: input.Latitude,
-                lon: input.Longitude,
-                imageUrl: input.ImageUrl,
-                lastExternalUpdate: DateTime.UtcNow
-            );
+            var name = input.Name.Trim();
+            var country = input.Country.Trim();
 
-            await _destinationRepository.InsertAsync(dest);
-            return ObjectMapper.Map<Destination, DestinationDto>(dest);
+            await _saveDestinationLock.WaitAsync();
+            try
+            {
+                var existing = await _destinationRepository.FirstOrDefaultAsync(d => d.Name == name && d.Country == country);
+                if (existing != null)
+                {
+                    var imgToUpdate = !string.IsNullOrEmpty(input.ImageUrl) ? input.ImageUrl : existing.ImageUrl;
+                    existing.UpdateDetails(input.Population, imgToUpdate);
+                    await _destinationRepository.UpdateAsync(existing);
+                    return ObjectMapper.Map<Destination, DestinationDto>(existing);
+                }
+
+                var dest = new Destination(
+                    id: GuidGenerator.Create(),
+                    name: name,
+                    country: country,
+                    population: input.Population,
+                    lat: input.Latitude,
+                    lon: input.Longitude,
+                    imageUrl: input.ImageUrl,
+                    lastExternalUpdate: DateTime.UtcNow
+                );
+
+                await _destinationRepository.InsertAsync(dest);
+                return ObjectMapper.Map<Destination, DestinationDto>(dest);
+            }
+            finally
+            {
+                _saveDestinationLock.Release();
+            }
         }
 
         [AllowAnonymous]
@@ -254,7 +271,7 @@ namespace TourismTracking.Destinations
             return ObjectMapper.Map<List<Destination>, List<DestinationDto>>(items);
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task DeleteSavedDestinationAsync(Guid id)
         {
             await _favoritesRepository.DeleteAsync(f => f.DestinationId == id);

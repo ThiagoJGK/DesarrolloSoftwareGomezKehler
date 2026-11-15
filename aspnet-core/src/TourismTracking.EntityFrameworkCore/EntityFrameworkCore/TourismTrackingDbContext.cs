@@ -89,6 +89,9 @@ public class TourismTrackingDbContext :
         builder.Entity<Destination>(b => {
             b.ToTable("AppDestinations");
             b.ConfigureByConvention(); // auto configure for auditing, soft delete, etc
+            b.Property(d => d.Name).IsRequired().HasMaxLength(256);
+            b.Property(d => d.Country).IsRequired().HasMaxLength(128);
+            b.HasIndex(d => new { d.Name, d.Country });
         });
 
         builder.Entity<Experience>(b => {
@@ -104,6 +107,7 @@ public class TourismTrackingDbContext :
         builder.Entity<FavoriteListItem>(b => {
             b.ToTable("AppFavorites");
             b.ConfigureByConvention();
+            b.HasIndex(f => new { f.UserId, f.DestinationId }).IsUnique();
         });
 
         builder.Entity<Notification>(b => {

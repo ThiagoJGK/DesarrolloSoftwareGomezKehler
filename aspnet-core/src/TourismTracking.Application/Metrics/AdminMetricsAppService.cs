@@ -107,6 +107,11 @@ namespace TourismTracking.Metrics
 
         public async Task<string> ExportMetricsReportAsync(string format)
         {
+            if (string.IsNullOrWhiteSpace(format) || !string.Equals(format.Trim(), "csv", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Volo.Abp.UserFriendlyException("Unsupported export format. Only 'csv' is supported.");
+            }
+
             var queryable = await _apiMetricRepository.GetQueryableAsync();
             var metrics = await AsyncExecuter.ToListAsync(queryable.OrderByDescending(m => m.CreationTime));
 
@@ -115,11 +120,32 @@ namespace TourismTracking.Metrics
 
             foreach (var m in metrics)
             {
-                csv.AppendLine($"{m.CreationTime:yyyy-MM-dd HH:mm:ss},{m.ApiName},{m.Endpoint},{m.IsSuccess},{m.ResponseTimeMs},{m.ErrorMessage?.Replace(",", ";")}");
+                csv.AppendLine($"{m.CreationTime:yyyy-MM-dd HH:mm:ss},{SanitizeCsvField(m.ApiName)},{SanitizeCsvField(m.Endpoint)},{m.IsSuccess},{m.ResponseTimeMs},{SanitizeCsvField(m.ErrorMessage)}");
             }
 
             var bytes = Encoding.UTF8.GetBytes(csv.ToString());
             return Convert.ToBase64String(bytes);
+        }
+
+        private static string SanitizeCsvField(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            var cleaned = value
+                .Replace(",", ";")
+                .Replace("\r", " ")
+                .Replace("\n", " ");
+
+            var trimmed = cleaned.Trim();
+            if (trimmed.Length > 0 && (trimmed[0] == '=' || trimmed[0] == '+' || trimmed[0] == '-' || trimmed[0] == '@'))
+            {
+                return $"'{cleaned}";
+            }
+
+            return cleaned;
         }
     }
 }

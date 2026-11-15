@@ -13,6 +13,8 @@ namespace TourismTracking.Experiences
 {
     public class TourismInteractionAppService : ApplicationService, ITourismInteractionAppService
     {
+        private static readonly System.Threading.SemaphoreSlim _favoritesLock = new(1, 1);
+
         private readonly IRepository<Review, Guid> _reviewRepo;
         private readonly IRepository<Experience, Guid> _experienceRepo;
         private readonly IRepository<FavoriteListItem, Guid> _favoritesRepo;
@@ -195,11 +197,19 @@ namespace TourismTracking.Experiences
         [Authorize]
         public async Task AddToFavoritesAsync(Guid destinationId)
         {
-            var userId = _currentUser.Id ?? throw new UnauthorizedAccessException("Must be logged in.");
-            var exists = await _favoritesRepo.AnyAsync(f => f.DestinationId == destinationId && f.UserId == userId);
-            if (!exists)
+            await _favoritesLock.WaitAsync();
+            try
             {
-                await _favoritesRepo.InsertAsync(new FavoriteListItem(GuidGenerator.Create(), destinationId, userId));
+                var userId = _currentUser.Id ?? throw new UnauthorizedAccessException("Must be logged in.");
+                var exists = await _favoritesRepo.AnyAsync(f => f.DestinationId == destinationId && f.UserId == userId);
+                if (!exists)
+                {
+                    await _favoritesRepo.InsertAsync(new FavoriteListItem(GuidGenerator.Create(), destinationId, userId));
+                }
+            }
+            finally
+            {
+                _favoritesLock.Release();
             }
         }
 

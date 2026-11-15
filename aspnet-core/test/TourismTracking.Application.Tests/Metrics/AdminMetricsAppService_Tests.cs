@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using Shouldly;
+using Volo.Abp;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Identity;
 using Volo.Abp.DependencyInjection;
@@ -115,6 +116,31 @@ namespace TourismTracking.Application.Tests.Metrics
             decoded.ShouldContain("Fecha,API,Endpoint,Exito,TiempoMs,Error");
             decoded.ShouldContain("OpenMeteo");
             decoded.ShouldContain("https://api.open-meteo.com/v1");
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("xml")]
+        [InlineData("../../etc/passwd")]
+        public async Task ExportMetricsReport_Should_Throw_For_Invalid_Format(string invalidFormat)
+        {
+            await Should.ThrowAsync<UserFriendlyException>(() => _service.ExportMetricsReportAsync(invalidFormat));
+        }
+
+        [Fact]
+        public async Task ExportMetricsReport_Should_Neutralize_Csv_Formula_Injection()
+        {
+            var metrics = new List<ApiMetric>
+            {
+                new ApiMetric(Guid.NewGuid(), "OpenMeteo", "https://api.open-meteo.com/v1", false, 120, "=CMD|' /C calc'!A0")
+            };
+
+            _apiMetricRepository.GetQueryableAsync().Returns(Task.FromResult(metrics.AsQueryable()));
+
+            var base64Csv = await _service.ExportMetricsReportAsync("csv");
+            var decoded = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64Csv));
+
+            decoded.ShouldContain("'=CMD|' /C calc'!A0");
         }
     }
 }

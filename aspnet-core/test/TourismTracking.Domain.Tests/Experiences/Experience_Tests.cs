@@ -66,5 +66,62 @@ namespace TourismTracking.Domain.Tests.Experiences
             exp.DestinationId.ShouldBe(destId);
             exp.UserId.ShouldBe(userId);
         }
+
+        [Fact]
+        public void Should_Throw_When_Title_Exceeds_MaxLength()
+        {
+            var tooLongTitle = new string('a', Experience.MaxTitleLength + 1);
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                new Experience(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), tooLongTitle, "Content", "tags")
+            );
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData(null)]
+        public void Should_Throw_For_Empty_Or_Null_Content(string invalidContent)
+        {
+            Assert.Throws<ArgumentException>(() =>
+                new Experience(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Title", invalidContent, "tags")
+            );
+        }
+
+        [Fact]
+        public void Should_Throw_When_Content_Exceeds_MaxLength()
+        {
+            var tooLongContent = new string('a', Experience.MaxContentLength + 1);
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                new Experience(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Title", tooLongContent, "tags")
+            );
+        }
+
+        [Fact]
+        public void Should_Throw_When_Keywords_Exceeds_MaxLength()
+        {
+            var tooLongKeywords = new string('a', Experience.MaxKeywordsLength + 1);
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                new Experience(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Title", "Content", tooLongKeywords)
+            );
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData(null)]
+        public void UpdateDetails_Should_Throw_For_Empty_Or_Null_Content(string invalidContent)
+        {
+            var exp = new Experience(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Title", "Content", "tags");
+            Assert.Throws<ArgumentException>(() => exp.UpdateDetails("Title", invalidContent, "tags"));
+        }
+
+        [Fact]
+        public void UpdateDetails_Should_Throw_When_Limits_Exceeded()
+        {
+            var exp = new Experience(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Title", "Content", "tags");
+            Assert.Throws<ArgumentOutOfRangeException>(() => exp.UpdateDetails(new string('a', Experience.MaxTitleLength + 1), "Content", "tags"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => exp.UpdateDetails("Title", new string('a', Experience.MaxContentLength + 1), "tags"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => exp.UpdateDetails("Title", "Content", new string('a', Experience.MaxKeywordsLength + 1)));
+        }
     }
 }

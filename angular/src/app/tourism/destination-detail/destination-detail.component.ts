@@ -60,13 +60,19 @@ export class DestinationDetailComponent implements OnInit {
     this.currentUserId = this.configState.getOne('currentUser')?.id;
     this.route.paramMap.subscribe(params => {
       this.destinationId = params.get('id') || '';
-      if (this.destinationId) {
+      if (this.isValidGuid(this.destinationId)) {
         this.loadDestinationDetails();
         this.loadMetricsAndReviews();
         this.loadExperiences();
         this.checkIfFavorite();
+      } else {
+        this.destination = undefined;
       }
     });
+  }
+
+  private isValidGuid(id: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) && id !== '00000000-0000-0000-0000-000000000000';
   }
 
   onImgError(event: any) {
