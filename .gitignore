@@ -32,3 +32,16 @@ ABP_Tools/
 *.pdf
 *.txt
 extract_pdfs.py
+
+# Logs
+*.log
+temp.log
+
+# Documentación interna y personal (no subir al repositorio)
+Documentacion/
+docs/
+PROJECT.md
+
+# Agent Metadata & Scratch
+.agents/
+scratch/

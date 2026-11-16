@@ -34,11 +34,11 @@ export class DestinationService {
     { apiName: this.apiName,...config });
   
 
-  searchExternalDestinations = (nameQuery: string, countryCode?: string, config?: Partial<Rest.Config>) =>
+  searchExternalDestinations = (nameQuery: string, countryCode?: string, regionQuery?: string, minPopulation?: number, config?: Partial<Rest.Config>) =>
     this.restService.request<any, DestinationDto[]>({
       method: 'POST',
       url: '/api/app/destination/search-external-destinations',
-      params: { nameQuery, countryCode },
+      params: { nameQuery, countryCode, regionQuery, minPopulation },
     },
     { apiName: this.apiName,...config });
 

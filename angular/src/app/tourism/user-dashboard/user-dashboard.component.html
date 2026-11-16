@@ -1,8 +1,103 @@
 <div class="container mt-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold"><i class="fas fa-layer-group me-2 text-primary"></i> Mi Tablero</h2>
-    <span class="badge bg-primary fs-6" *ngIf="isAdmin"><i class="fas fa-shield-alt me-1"></i> Mode: Admin</span>
+  
+  <!-- Header de Mi Tablero -->
+  <div class="card border-0 shadow-sm mb-4 text-white rounded-3" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-info bg-opacity-25 text-white px-3 py-2 fs-6 border border-info border-opacity-25">
+              <i class="fas fa-compass me-1"></i> Comunidad WanderTrack
+            </span>
+            <span class="badge bg-secondary px-2 py-1">
+              {{ currentUser?.userName ? '@' + currentUser.userName : (profileUsername ? '@' + profileUsername : 'Mi Tablero') }}
+            </span>
+          </div>
+          <h4 class="fw-bold mb-1">Mi Tablero Personal</h4>
+          <p class="text-light opacity-75 mb-0 small">
+            Gestiona tus destinos favoritos, bitácoras de viaje y notificaciones en tiempo real.
+          </p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-outline-light btn-sm px-3" (click)="setTab('experiences')" [class.active]="activeTab === 'experiences'">
+            <i class="fas fa-book-open me-1"></i> Experiencias ({{ myExperiences.length }})
+          </button>
+          <button class="btn btn-outline-light btn-sm px-3" (click)="setTab('favorites')" [class.active]="activeTab === 'favorites'">
+            <i class="fas fa-heart me-1 text-danger"></i> Favoritos ({{ favoriteDestinations.length }})
+          </button>
+          <button class="btn btn-outline-light btn-sm px-3" (click)="setTab('notifications')" [class.active]="activeTab === 'notifications'">
+            <i class="fas fa-bell me-1 text-warning"></i> Notificaciones ({{ notifications.length }})
+            <span class="badge bg-danger rounded-pill ms-1" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
+          </button>
+          <button *ngIf="isAdmin" class="btn btn-warning btn-sm px-3 text-dark fw-semibold" (click)="setTab('admin')" [class.active]="activeTab === 'admin'">
+            <i class="fas fa-chart-line me-1"></i> Métricas API
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- Perfil de Usuario y Cabecera -->
+  <div class="card shadow-sm border-0 mb-5 bg-white overflow-hidden">
+    <div class="row g-0">
+      <!-- Columna Foto de Perfil (Interactive) -->
+      <div class="col-md-3 bg-light d-flex flex-column align-items-center justify-content-center p-4 position-relative border-end">
+        <div class="position-relative profile-avatar-container cursor-pointer mb-3" (click)="fileInput.click()">
+          <!-- SVG Icon Placeholder when there is no photo -->
+          <div *ngIf="!photoBase64" class="rounded-circle border bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 140px; height: 140px; font-size: 5rem;">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <!-- Loaded base64 image -->
+          <img *ngIf="photoBase64" [src]="photoBase64" class="rounded-circle border shadow-sm" style="width: 140px; height: 140px; object-fit: cover;" alt="Foto de perfil">
+          
+          <!-- Hover Overlay -->
+          <div class="profile-avatar-overlay rounded-circle d-flex align-items-center justify-content-center">
+            <i class="fas fa-camera text-white fa-2x"></i>
+          </div>
+        </div>
+        <input #fileInput type="file" class="d-none" accept="image/png, image/jpeg" (change)="onPhotoSelected($event)">
+        <small class="text-muted text-center"><i class="fas fa-info-circle me-1"></i> Haz clic para cambiar (JPG o PNG)</small>
+      </div>
+
+      <!-- Columna Detalles y Edición -->
+      <div class="col-md-9 p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h3 class="fw-bold mb-1 text-dark">{{ profileName }} {{ profileSurname }}</h3>
+            <p class="text-muted mb-0">&#64;{{ profileUsername }} | {{ profileEmail }}</p>
+          </div>
+          <span class="badge bg-primary fs-6" *ngIf="isAdmin"><i class="fas fa-shield-alt me-1"></i> Administrador</span>
+        </div>
+
+        <hr class="my-3">
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-secondary">Nombre</label>
+            <input type="text" class="form-control" [(ngModel)]="profileName">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-secondary">Apellido</label>
+            <input type="text" class="form-control" [(ngModel)]="profileSurname">
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold text-secondary">Preferencias de viaje (ej: playa, museos, gastronomía)</label>
+            <textarea class="form-control" rows="2" [(ngModel)]="profilePreferences" placeholder="Cuéntanos qué te gusta hacer cuando viajas..."></textarea>
+          </div>
+          <div class="col-12 d-flex justify-content-between align-items-center mt-4">
+            <button class="btn btn-outline-danger btn-sm" (click)="deleteAccount()">
+              <i class="fas fa-user-slash me-2"></i> Eliminar Cuenta
+            </button>
+            <button class="btn btn-primary px-4" (click)="saveProfile()">
+              <i class="fas fa-save me-2"></i> Guardar Perfil
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="fw-bold mb-4"><i class="fas fa-layer-group me-2 text-primary"></i> Mi Tablero</h2>
 
   <ul class="nav nav-tabs mb-4">
     <li class="nav-item">
@@ -13,6 +108,12 @@
     <li class="nav-item">
       <a class="nav-link" [class.active]="activeTab === 'favorites'" href="javascript:void(0)" (click)="setTab('favorites')">
         <i class="fas fa-heart me-2 text-danger"></i> Mis Favoritos
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'notifications'" href="javascript:void(0)" (click)="setTab('notifications')">
+        <i class="fas fa-bell me-2" [class.text-warning]="unreadNotificationsCount > 0"></i> Notificaciones
+        <span class="badge bg-danger rounded-pill ms-2" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
       </a>
     </li>
     <li class="nav-item" *ngIf="isAdmin">
@@ -40,11 +141,23 @@
               </thead>
               <tbody>
                 <tr *ngFor="let exp of myExperiences">
-                  <td class="fw-semibold">{{ exp.title }}</td>
-                  <td>{{ exp.keywords }}</td>
+                  <td class="fw-semibold">
+                    <span *ngIf="editingExperienceId !== exp.id">{{ exp.title }}</span>
+                    <input *ngIf="editingExperienceId === exp.id" type="text" class="form-control form-control-sm" [(ngModel)]="editExperienceData.title">
+                  </td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                    <span *ngIf="editingExperienceId !== exp.id">{{ exp.keywords }}</span>
+                    <input *ngIf="editingExperienceId === exp.id" type="text" class="form-control form-control-sm" [(ngModel)]="editExperienceData.keywords">
+                  </td>
+                  <td>
+                    <ng-container *ngIf="editingExperienceId !== exp.id">
+                      <button class="btn btn-sm btn-outline-primary me-2" (click)="startEditExperience(exp)"><i class="fas fa-edit"></i></button>
+                      <button class="btn btn-sm btn-outline-danger" (click)="deleteExperience(exp.id || '')"><i class="fas fa-trash"></i></button>
+                    </ng-container>
+                    <ng-container *ngIf="editingExperienceId === exp.id">
+                      <button class="btn btn-sm btn-success me-1" (click)="saveEditExperience()"><i class="fas fa-check"></i></button>
+                      <button class="btn btn-sm btn-secondary" (click)="cancelEditExperience()"><i class="fas fa-times"></i></button>
+                    </ng-container>
                   </td>
                 </tr>
                 <tr *ngIf="myExperiences.length === 0">
@@ -78,36 +191,202 @@
       </div>
     </div>
 
-    <!-- Tab Admin -->
+    <!-- Tab Notificaciones -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'notifications'" [class.active]="activeTab === 'notifications'" *ngIf="activeTab === 'notifications'">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div class="d-flex align-items-center">
+              <h4 class="card-title mb-0 fw-bold text-dark"><i class="fas fa-bell text-warning me-2"></i>Centro de Notificaciones</h4>
+              <span class="badge bg-danger rounded-pill ms-2" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-outline-primary" (click)="triggerTestNotification()" [disabled]="simulatingNotification" title="Simular un aviso en tiempo real sobre un destino favorito">
+                <i class="fas fa-bell me-1"></i> {{ simulatingNotification ? 'Generando...' : 'Simular Alerta en Vivo' }}
+              </button>
+              <button class="btn btn-outline-secondary" (click)="markAllAsRead()" [disabled]="unreadNotificationsCount === 0">
+                <i class="fas fa-check-double me-1"></i> Marcar todas como leídas
+              </button>
+            </div>
+          </div>
+          
+          <div class="list-group">
+            <div class="list-group-item list-group-item-action flex-column align-items-start border-start border-4 mb-2 shadow-sm rounded"
+                 [class.border-warning]="!notif.isRead"
+                 [class.border-light]="notif.isRead"
+                 [class.bg-light]="notif.isRead"
+                 *ngFor="let notif of notifications">
+              <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                  <i class="fas fa-bell" [class.text-warning]="!notif.isRead" [class.text-muted]="notif.isRead"></i>
+                  <span>{{ notif.title }}</span>
+                </h5>
+                <small class="text-muted"><i class="far fa-clock me-1"></i>{{ notif.creationTime | date:'dd/MM/yyyy HH:mm' }}</small>
+              </div>
+              <p class="mb-2 text-muted">{{ notif.message }}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="badge bg-warning text-dark me-1" *ngIf="!notif.isRead">
+                    <i class="fas fa-circle me-1 small"></i>Nueva
+                  </span>
+                  <span class="badge bg-success me-1" *ngIf="notif.isRead">
+                    <i class="fas fa-check me-1"></i>Leída
+                  </span>
+                </div>
+                <button class="btn btn-sm btn-link p-0 text-decoration-none text-primary fw-semibold" *ngIf="!notif.isRead" (click)="markAsRead(notif.id)">
+                  <i class="fas fa-envelope-open me-1"></i> Marcar como leída
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-secondary text-center py-4" *ngIf="notifications.length === 0">No tienes notificaciones en este momento.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Admin (Métricas y Reportes Dinámicos) -->
     <div class="tab-pane fade" [class.show]="activeTab === 'admin'" [class.active]="activeTab === 'admin'" *ngIf="activeTab === 'admin' && isAdmin">
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="card text-white bg-success shadow-sm h-100">
-            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
-              <h1 class="display-3 fw-bold">142</h1>
-              <h5 class="card-title">LLamadas API GeoDB Cities</h5>
-              <p class="card-text opacity-75">Últimos 30 días</p>
+      
+      <!-- Panel de Estadísticas Generales -->
+      <div class="row g-3 mb-4" *ngIf="systemStats">
+        <div class="col-md-4">
+          <div class="card bg-primary text-white border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <i class="fas fa-users fa-3x me-3 opacity-75"></i>
+              <div>
+                <h6 class="card-title mb-1 opacity-75">Total de Usuarios</h6>
+                <h3 class="fw-bold mb-0">{{ systemStats.totalUsers }}</h3>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-6 mb-4">
-          <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-              <h5 class="card-title text-success"><i class="fas fa-server me-2"></i>Estado de Workers</h5>
-              <ul class="list-group list-group-flush mt-3">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  Sincronización de Destinos
-                  <span class="badge bg-success rounded-pill">Activo (Diario)</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  Búsqueda Ticketmaster API
-                  <span class="badge bg-success rounded-pill">Activo (Idle)</span>
-                </li>
-              </ul>
+        <div class="col-md-4">
+          <div class="card bg-success text-white border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <i class="fas fa-book-open fa-3x me-3 opacity-75"></i>
+              <div>
+                <h6 class="card-title mb-1 opacity-75">Experiencias Creadas</h6>
+                <h3 class="fw-bold mb-0">{{ systemStats.totalExperiences }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-info text-white border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <i class="fas fa-map-marked-alt fa-3x me-3 opacity-75"></i>
+              <div>
+                <h6 class="card-title mb-1 opacity-75">Destinos Guardados</h6>
+                <h3 class="fw-bold mb-0">{{ systemStats.totalSavedDestinations }}</h3>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Resumen de Consumo de APIs Externas -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0"><i class="fas fa-network-wired text-primary me-2"></i>Consumo de APIs Externas</h5>
+            <button class="btn btn-sm btn-outline-success" (click)="exportReport()" [disabled]="exportingMetrics">
+              <i class="fas fa-download me-1"></i> {{ exportingMetrics ? 'Exportando...' : 'Descargar Reporte CSV' }}
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>API Externa</th>
+                  <th>Total Llamadas</th>
+                  <th>Exitosas</th>
+                  <th>Fallidas</th>
+                  <th>Tiempo Resp. Promedio</th>
+                  <th>Tasa de Éxito</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let summary of apiUsageSummary">
+                  <td class="fw-bold">{{ summary.apiName }}</td>
+                  <td>{{ summary.totalCalls }}</td>
+                  <td class="text-success">{{ summary.successCalls }}</td>
+                  <td class="text-danger">{{ summary.failedCalls }}</td>
+                  <td>{{ summary.averageResponseTimeMs }} ms</td>
+                  <td>
+                    <span class="badge" [class.bg-success]="summary.successRate >= 90" [class.bg-warning]="summary.successRate >= 70 && summary.successRate < 90" [class.bg-danger]="summary.successRate < 70">
+                      {{ summary.successRate }}%
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="apiUsageSummary.length === 0">
+                  <td colspan="6" class="text-center text-muted">No se registran llamadas a APIs externas aún.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Destinos Más Reseñados -->
+        <div class="col-md-6 mb-4" *ngIf="systemStats">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h5 class="fw-bold text-dark mb-3"><i class="fas fa-star text-warning me-2"></i>Destinos Más Reseñados</h5>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Destino</th>
+                      <th>Reseñas</th>
+                      <th>Rating Promedio</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let d of systemStats.mostReviewedDestinations">
+                      <td>
+                        <span class="fw-semibold text-dark">{{ d.destinationName }}</span><br>
+                        <small class="text-muted">{{ d.country }}</small>
+                      </td>
+                      <td>{{ d.reviewsCount }}</td>
+                      <td class="text-warning fw-bold">⭐ {{ d.averageRating }}</td>
+                    </tr>
+                    <tr *ngIf="systemStats.mostReviewedDestinations.length === 0">
+                      <td colspan="3" class="text-center text-muted">No hay reseñas registradas aún.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registro de Llamadas Recientes (Últimas 10) -->
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h5 class="fw-bold text-dark mb-3"><i class="fas fa-history text-secondary me-2"></i>Monitoreo en Vivo (Llamadas Recientes)</h5>
+              <div class="list-group list-group-flush" style="max-height: 350px; overflow-y: auto;">
+                <div class="list-group-item px-0 py-2 border-bottom" *ngFor="let call of recentApiCalls.slice(0,10)">
+                  <div class="d-flex w-100 justify-content-between align-items-center">
+                    <span class="badge" [class.bg-success]="call.isSuccess" [class.bg-danger]="!call.isSuccess">
+                      {{ call.apiName }}
+                    </span>
+                    <small class="text-muted">{{ call.creationTime | date:'HH:mm:ss' }}</small>
+                  </div>
+                  <p class="mb-1 text-truncate small mt-1 text-dark" style="max-width: 100%;">{{ call.endpoint }}</p>
+                  <div class="d-flex justify-content-between">
+                    <small class="text-muted"><i class="fas fa-stopwatch me-1"></i>{{ call.responseTimeMs }} ms</small>
+                    <small class="text-danger fw-semibold" *ngIf="!call.isSuccess">{{ call.errorMessage }}</small>
+                  </div>
+                </div>
+                <div class="text-center text-muted py-4" *ngIf="recentApiCalls.length === 0">No hay llamadas recientes registradas.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>

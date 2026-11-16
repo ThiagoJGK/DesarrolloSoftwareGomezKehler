@@ -903,6 +903,22 @@
                       "typeSimple": "string",
                       "isOptional": true,
                       "defaultValue": null
+                    },
+                    {
+                      "name": "regionQuery",
+                      "typeAsString": "System.String, System.Private.CoreLib",
+                      "type": "System.String",
+                      "typeSimple": "string",
+                      "isOptional": true,
+                      "defaultValue": null
+                    },
+                    {
+                      "name": "minPopulation",
+                      "typeAsString": "System.Nullable`1[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib",
+                      "type": "System.Int32?",
+                      "typeSimple": "number?",
+                      "isOptional": true,
+                      "defaultValue": null
                     }
                   ],
                   "returnValue": {
@@ -956,8 +972,8 @@
             }
           ],
           "actions": {
-            "SearchExternalDestinationsAsyncByNameQueryAndCountryCode": {
-              "uniqueName": "SearchExternalDestinationsAsyncByNameQueryAndCountryCode",
+            "SearchExternalDestinationsAsyncByNameQueryAndCountryCodeAndRegionQueryAndMinPopulation": {
+              "uniqueName": "SearchExternalDestinationsAsyncByNameQueryAndCountryCodeAndRegionQueryAndMinPopulation",
               "name": "SearchExternalDestinationsAsync",
               "httpMethod": "POST",
               "url": "api/app/destination/search-external-destinations",
@@ -976,6 +992,22 @@
                   "typeAsString": "System.String, System.Private.CoreLib",
                   "type": "System.String",
                   "typeSimple": "string",
+                  "isOptional": true,
+                  "defaultValue": null
+                },
+                {
+                  "name": "regionQuery",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": true,
+                  "defaultValue": null
+                },
+                {
+                  "name": "minPopulation",
+                  "typeAsString": "System.Nullable`1[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib",
+                  "type": "System.Int32?",
+                  "typeSimple": "number?",
                   "isOptional": true,
                   "defaultValue": null
                 }
@@ -1004,13 +1036,37 @@
                   "constraintTypes": null,
                   "bindingSourceId": "ModelBinding",
                   "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "regionQuery",
+                  "name": "regionQuery",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "minPopulation",
+                  "name": "minPopulation",
+                  "jsonName": null,
+                  "type": "System.Int32?",
+                  "typeSimple": "number?",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
                 }
               ],
               "returnValue": {
                 "type": "System.Collections.Generic.List<TourismTracking.Destinations.DestinationDto>",
                 "typeSimple": "[TourismTracking.Destinations.DestinationDto]"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Destinations.IDestinationAppService"
             },
             "SaveDestinationToInternalDbAsyncByInput": {
@@ -1047,7 +1103,7 @@
                 "type": "TourismTracking.Destinations.DestinationDto",
                 "typeSimple": "TourismTracking.Destinations.DestinationDto"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Destinations.IDestinationAppService"
             },
             "GetSavedDestinationsAsync": {
@@ -1062,7 +1118,7 @@
                 "type": "System.Collections.Generic.List<TourismTracking.Destinations.DestinationDto>",
                 "typeSimple": "[TourismTracking.Destinations.DestinationDto]"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Destinations.IDestinationAppService"
             },
             "DeleteSavedDestinationAsyncById": {
@@ -1099,7 +1155,7 @@
                 "type": "System.Void",
                 "typeSimple": "System.Void"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Destinations.IDestinationAppService"
             }
           }
@@ -1358,6 +1414,14 @@
                   }
                 },
                 {
+                  "name": "GetMyExperiencesAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TourismTracking.Experiences.ExperienceDto>",
+                    "typeSimple": "[TourismTracking.Experiences.ExperienceDto]"
+                  }
+                },
+                {
                   "name": "AddToFavoritesAsync",
                   "parametersOnMethod": [
                     {
@@ -1477,7 +1541,7 @@
                 "type": "TourismTracking.Experiences.ReviewDto",
                 "typeSimple": "TourismTracking.Experiences.ReviewDto"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "EditReviewAsyncByReviewIdAndRatingAndComment": {
@@ -1554,7 +1618,7 @@
                 "type": "TourismTracking.Experiences.ReviewDto",
                 "typeSimple": "TourismTracking.Experiences.ReviewDto"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "DeleteReviewAsyncByReviewId": {
@@ -1591,7 +1655,7 @@
                 "type": "System.Void",
                 "typeSimple": "System.Void"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "GetDestinationAverageRatingAsyncByDestinationId": {
@@ -1628,7 +1692,7 @@
                 "type": "TourismTracking.Experiences.DestinationMetricsDto",
                 "typeSimple": "TourismTracking.Experiences.DestinationMetricsDto"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "GetDestinationReviewsAsyncByDestinationId": {
@@ -1665,7 +1729,7 @@
                 "type": "System.Collections.Generic.List<TourismTracking.Experiences.ReviewDto>",
                 "typeSimple": "[TourismTracking.Experiences.ReviewDto]"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "CreateExperienceAsyncByDestinationIdAndTitleAndContentAndKeywords": {
@@ -1762,7 +1826,7 @@
                 "type": "TourismTracking.Experiences.ExperienceDto",
                 "typeSimple": "TourismTracking.Experiences.ExperienceDto"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "EditExperienceAsyncByExperienceIdAndTitleAndContentAndKeywords": {
@@ -1859,7 +1923,7 @@
                 "type": "TourismTracking.Experiences.ExperienceDto",
                 "typeSimple": "TourismTracking.Experiences.ExperienceDto"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "DeleteExperienceAsyncByExperienceId": {
@@ -1896,7 +1960,7 @@
                 "type": "System.Void",
                 "typeSimple": "System.Void"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "GetExperiencesByDestinationAsyncByDestinationIdAndKeywordFilter": {
@@ -1953,7 +2017,22 @@
                 "type": "System.Collections.Generic.List<TourismTracking.Experiences.ExperienceDto>",
                 "typeSimple": "[TourismTracking.Experiences.ExperienceDto]"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
+              "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
+            },
+            "GetMyExperiencesAsync": {
+              "uniqueName": "GetMyExperiencesAsync",
+              "name": "GetMyExperiencesAsync",
+              "httpMethod": "GET",
+              "url": "api/app/tourism-interaction/my-experiences",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<TourismTracking.Experiences.ExperienceDto>",
+                "typeSimple": "[TourismTracking.Experiences.ExperienceDto]"
+              },
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "AddToFavoritesAsyncByDestinationId": {
@@ -1990,7 +2069,7 @@
                 "type": "System.Void",
                 "typeSimple": "System.Void"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "RemoveFromFavoritesAsyncByDestinationId": {
@@ -2027,7 +2106,7 @@
                 "type": "System.Void",
                 "typeSimple": "System.Void"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
             },
             "GetMyFavoriteDestinationsAsync": {
@@ -2042,8 +2121,362 @@
                 "type": "System.Collections.Generic.List<System.Guid>",
                 "typeSimple": "[string]"
               },
-              "allowAnonymous": null,
+              "allowAnonymous": false,
               "implementFrom": "TourismTracking.Experiences.ITourismInteractionAppService"
+            }
+          }
+        },
+        "TourismTracking.Metrics.AdminMetricsAppService": {
+          "controllerName": "AdminMetrics",
+          "controllerGroupName": "AdminMetrics",
+          "isRemoteService": true,
+          "isIntegrationService": false,
+          "apiVersion": null,
+          "type": "TourismTracking.Metrics.AdminMetricsAppService",
+          "interfaces": [
+            {
+              "type": "TourismTracking.Metrics.IAdminMetricsAppService",
+              "name": "IAdminMetricsAppService",
+              "methods": [
+                {
+                  "name": "GetApiUsageSummaryAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TourismTracking.Metrics.ApiUsageSummaryDto>",
+                    "typeSimple": "[TourismTracking.Metrics.ApiUsageSummaryDto]"
+                  }
+                },
+                {
+                  "name": "GetSystemStatisticsAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "TourismTracking.Metrics.SystemStatisticsDto",
+                    "typeSimple": "TourismTracking.Metrics.SystemStatisticsDto"
+                  }
+                },
+                {
+                  "name": "GetRecentApiCallsAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TourismTracking.Metrics.ApiMetricDto>",
+                    "typeSimple": "[TourismTracking.Metrics.ApiMetricDto]"
+                  }
+                },
+                {
+                  "name": "ExportMetricsReportAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "format",
+                      "typeAsString": "System.String, System.Private.CoreLib",
+                      "type": "System.String",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.String",
+                    "typeSimple": "string"
+                  }
+                }
+              ]
+            }
+          ],
+          "actions": {
+            "GetApiUsageSummaryAsync": {
+              "uniqueName": "GetApiUsageSummaryAsync",
+              "name": "GetApiUsageSummaryAsync",
+              "httpMethod": "GET",
+              "url": "api/app/admin-metrics/api-usage-summary",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<TourismTracking.Metrics.ApiUsageSummaryDto>",
+                "typeSimple": "[TourismTracking.Metrics.ApiUsageSummaryDto]"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TourismTracking.Metrics.IAdminMetricsAppService"
+            },
+            "GetSystemStatisticsAsync": {
+              "uniqueName": "GetSystemStatisticsAsync",
+              "name": "GetSystemStatisticsAsync",
+              "httpMethod": "GET",
+              "url": "api/app/admin-metrics/system-statistics",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "TourismTracking.Metrics.SystemStatisticsDto",
+                "typeSimple": "TourismTracking.Metrics.SystemStatisticsDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TourismTracking.Metrics.IAdminMetricsAppService"
+            },
+            "GetRecentApiCallsAsync": {
+              "uniqueName": "GetRecentApiCallsAsync",
+              "name": "GetRecentApiCallsAsync",
+              "httpMethod": "GET",
+              "url": "api/app/admin-metrics/recent-api-calls",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<TourismTracking.Metrics.ApiMetricDto>",
+                "typeSimple": "[TourismTracking.Metrics.ApiMetricDto]"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TourismTracking.Metrics.IAdminMetricsAppService"
+            },
+            "ExportMetricsReportAsyncByFormat": {
+              "uniqueName": "ExportMetricsReportAsyncByFormat",
+              "name": "ExportMetricsReportAsync",
+              "httpMethod": "POST",
+              "url": "api/app/admin-metrics/export-metrics-report",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "format",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "format",
+                  "name": "format",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.String",
+                "typeSimple": "string"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TourismTracking.Metrics.IAdminMetricsAppService"
+            }
+          }
+        },
+        "TourismTracking.Notifications.NotificationAppService": {
+          "controllerName": "Notification",
+          "controllerGroupName": "Notification",
+          "isRemoteService": true,
+          "isIntegrationService": false,
+          "apiVersion": null,
+          "type": "TourismTracking.Notifications.NotificationAppService",
+          "interfaces": [
+            {
+              "type": "TourismTracking.Notifications.INotificationAppService",
+              "name": "INotificationAppService",
+              "methods": [
+                {
+                  "name": "GetMyNotificationsAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TourismTracking.Notifications.NotificationDto>",
+                    "typeSimple": "[TourismTracking.Notifications.NotificationDto]"
+                  }
+                },
+                {
+                  "name": "MarkAsReadAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "id",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.Void",
+                    "typeSimple": "System.Void"
+                  }
+                },
+                {
+                  "name": "MarkAllAsReadAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "System.Void",
+                    "typeSimple": "System.Void"
+                  }
+                }
+              ]
+            }
+          ],
+          "actions": {
+            "GetMyNotificationsAsync": {
+              "uniqueName": "GetMyNotificationsAsync",
+              "name": "GetMyNotificationsAsync",
+              "httpMethod": "GET",
+              "url": "api/app/notification/my-notifications",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<TourismTracking.Notifications.NotificationDto>",
+                "typeSimple": "[TourismTracking.Notifications.NotificationDto]"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TourismTracking.Notifications.INotificationAppService"
+            },
+            "MarkAsReadAsyncById": {
+              "uniqueName": "MarkAsReadAsyncById",
+              "name": "MarkAsReadAsync",
+              "httpMethod": "POST",
+              "url": "api/app/notification/{id}/mark-as-read",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TourismTracking.Notifications.INotificationAppService"
+            },
+            "MarkAllAsReadAsync": {
+              "uniqueName": "MarkAllAsReadAsync",
+              "name": "MarkAllAsReadAsync",
+              "httpMethod": "POST",
+              "url": "api/app/notification/mark-all-as-read",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TourismTracking.Notifications.INotificationAppService"
+            }
+          }
+        },
+        "TourismTracking.Users.TourismUserAppService": {
+          "controllerName": "TourismUser",
+          "controllerGroupName": "TourismUser",
+          "isRemoteService": true,
+          "isIntegrationService": false,
+          "apiVersion": null,
+          "type": "TourismTracking.Users.TourismUserAppService",
+          "interfaces": [
+            {
+              "type": "TourismTracking.Users.ITourismUserAppService",
+              "name": "ITourismUserAppService",
+              "methods": [
+                {
+                  "name": "DeleteMyAccountAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "System.Void",
+                    "typeSimple": "System.Void"
+                  }
+                },
+                {
+                  "name": "GetPublicProfileAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "userId",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "TourismTracking.Users.PublicUserProfileDto",
+                    "typeSimple": "TourismTracking.Users.PublicUserProfileDto"
+                  }
+                }
+              ]
+            }
+          ],
+          "actions": {
+            "DeleteMyAccountAsync": {
+              "uniqueName": "DeleteMyAccountAsync",
+              "name": "DeleteMyAccountAsync",
+              "httpMethod": "DELETE",
+              "url": "api/app/tourism-user/my-account",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TourismTracking.Users.ITourismUserAppService"
+            },
+            "GetPublicProfileAsyncByUserId": {
+              "uniqueName": "GetPublicProfileAsyncByUserId",
+              "name": "GetPublicProfileAsync",
+              "httpMethod": "GET",
+              "url": "api/app/tourism-user/public-profile/{userId}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "userId",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "userId",
+                  "name": "userId",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "TourismTracking.Users.PublicUserProfileDto",
+                "typeSimple": "TourismTracking.Users.PublicUserProfileDto"
+              },
+              "allowAnonymous": true,
+              "implementFrom": "TourismTracking.Users.ITourismUserAppService"
             }
           }
         }
@@ -4931,6 +5364,30 @@
           "regex": null
         },
         {
+          "name": "DestinationId",
+          "jsonName": null,
+          "type": "System.Guid",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "UserId",
+          "jsonName": null,
+          "type": "System.Guid",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
           "name": "Title",
           "jsonName": null,
           "type": "System.String",
@@ -5015,6 +5472,444 @@
           "name": "UserId",
           "jsonName": null,
           "type": "System.Guid",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "TourismTracking.Metrics.ApiMetricDto": {
+      "baseType": "Volo.Abp.Application.Dtos.EntityDto<System.Guid>",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "ApiName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Endpoint",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "IsSuccess",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "ResponseTimeMs",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "ErrorMessage",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "CreationTime",
+          "jsonName": null,
+          "type": "System.DateTime",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "TourismTracking.Metrics.ApiUsageSummaryDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "ApiName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "TotalCalls",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "SuccessCalls",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "FailedCalls",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "AverageResponseTimeMs",
+          "jsonName": null,
+          "type": "System.Double",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "SuccessRate",
+          "jsonName": null,
+          "type": "System.Double",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "TourismTracking.Metrics.MostReviewedDestinationDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "DestinationName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Country",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "ReviewsCount",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "AverageRating",
+          "jsonName": null,
+          "type": "System.Double",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "TourismTracking.Metrics.SystemStatisticsDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "TotalUsers",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "TotalExperiences",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "TotalSavedDestinations",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "MostReviewedDestinations",
+          "jsonName": null,
+          "type": "[TourismTracking.Metrics.MostReviewedDestinationDto]",
+          "typeSimple": "[TourismTracking.Metrics.MostReviewedDestinationDto]",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "TourismTracking.Notifications.NotificationDto": {
+      "baseType": "Volo.Abp.Application.Dtos.EntityDto<System.Guid>",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "UserId",
+          "jsonName": null,
+          "type": "System.Guid",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Title",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Message",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "IsRead",
+          "jsonName": null,
+          "type": "System.Boolean",
+          "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "CreationTime",
+          "jsonName": null,
+          "type": "System.DateTime",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "TourismTracking.Users.PublicUserProfileDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "Id",
+          "jsonName": null,
+          "type": "System.Guid",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "UserName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Name",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Surname",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Email",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Photo",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Preferences",
+          "jsonName": null,
+          "type": "System.String",
           "typeSimple": "string",
           "isRequired": false,
           "minLength": null,
@@ -5525,6 +6420,37 @@
           "jsonName": null,
           "type": "System.Boolean",
           "typeSimple": "boolean",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "Volo.Abp.Application.Dtos.EntityDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": []
+    },
+    "Volo.Abp.Application.Dtos.EntityDto<T0>": {
+      "baseType": "Volo.Abp.Application.Dtos.EntityDto",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": [
+        "TKey"
+      ],
+      "properties": [
+        {
+          "name": "Id",
+          "jsonName": null,
+          "type": "TKey",
+          "typeSimple": "TKey",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,

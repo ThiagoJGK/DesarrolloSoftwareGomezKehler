@@ -9,7 +9,7 @@ namespace TourismTracking.Destinations
     public interface IDestinationAppService : IApplicationService
     {
         // Métodos hacia la API externa
-        Task<List<DestinationDto>> SearchExternalDestinationsAsync(string nameQuery, string countryCode = null);
+        Task<List<DestinationDto>> SearchExternalDestinationsAsync(string nameQuery, string countryCode = null, string regionQuery = null, int? minPopulation = null);
         
         // Métodos hacia la Base de Datos Interna
         Task<DestinationDto> SaveDestinationToInternalDbAsync(SaveDestinationInput input);

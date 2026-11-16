@@ -94,6 +94,14 @@ export class TourismInteractionService {
     { apiName: this.apiName,...config });
   
 
+  getMyExperiences = (config?: Partial<Rest.Config>) =>
+    this.restService.request<any, ExperienceDto[]>({
+      method: 'GET',
+      url: '/api/app/tourism-interaction/my-experiences',
+    },
+    { apiName: this.apiName,...config });
+  
+
   getMyFavoriteDestinations = (config?: Partial<Rest.Config>) =>
     this.restService.request<any, string[]>({
       method: 'GET',
